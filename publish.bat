@@ -10,7 +10,7 @@ set RID=win-x64
 echo ========================================
 echo   CassieWordCheck - Publish Package
 echo   Runtime: %RID% (Self-contained)
-echo   Version: 2.3.0
+echo   Version: 2.3.2
 echo ========================================
 echo.
 

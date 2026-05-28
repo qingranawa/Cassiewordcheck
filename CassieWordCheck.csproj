@@ -12,7 +12,9 @@
     <FileVersion>2.3.1.0</FileVersion>
     <AssemblyName>CassieWordCheck</AssemblyName>
     <RootNamespace>CassieWordCheck</RootNamespace>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <Deterministic>true</Deterministic>
+    <NoWarn>$(NoWarn);MSB3246</NoWarn>
   </PropertyGroup>
 
   <!-- Debug 配置 -->
@@ -25,6 +27,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
@@ -33,6 +36,7 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="ClosedXML" Version="0.102.3" />
+    <PackageReference Include="System.Xml.ReaderWriter" Version="4.3.1" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
