@@ -7,7 +7,7 @@
 [![Stars](https://img.shields.io/github/stars/qingranawa/Cassiewordcheck)](https://github.com/qingranawa/Cassiewordcheck)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**CASSIE Word Check** — 逐词比对 CASSIE 配音词库，标记可用/不可用单词，用于 **SCP: Secret Laboratory** 游戏 CASSIE 语音文本校对。
+**CASSIE Word Check** — SCP: Secret Laboratory 广播文本检查工具，逐词比对 CASSIE 配音词库，标记可用/不可用单词，避免游戏内「播音事故」。
 
 > SCP:SL 中的 CASSIE 系统是一个文本转语音（TTS）合成器，用于播放游戏内广播。但并非所有英文单词都能被 CASSIE 正确朗读——本工具帮助你快速检查广播文本中的单词是否在 CASSIE 词库中，避免「播音事故」。
 
