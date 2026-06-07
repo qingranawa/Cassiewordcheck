@@ -2,8 +2,10 @@
 
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
 [![WPF](https://img.shields.io/badge/UI-WPF-512BD4)](https://github.com/dotnet/wpf)
+[![Version](https://img.shields.io/github/v/release/qingranawa/Cassiewordcheck)](https://github.com/qingranawa/Cassiewordcheck/releases)
+[![Downloads](https://img.shields.io/github/downloads/qingranawa/Cassiewordcheck/total)](https://github.com/qingranawa/Cassiewordcheck/releases)
+[![Stars](https://img.shields.io/github/stars/qingranawa/Cassiewordcheck)](https://github.com/qingranawa/Cassiewordcheck)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-2.3.0-blue)](https://github.com/qingranawa/Cassiewordcheck/releases)
 
 **CASSIE Word Check** — 逐词比对 CASSIE 配音词库，标记可用/不可用单词，用于 **SCP: Secret Laboratory** 游戏 CASSIE 语音文本校对。
 
@@ -33,7 +35,7 @@
 
 ## 🖼️ 截图
 
-> *（待补充）*
+> ⏳ 截图待补充 — 欢迎贡献运行截图，建议包含：主界面检查效果、统计面板、设置页面
 
 ## 📦 安装
 
