@@ -143,7 +143,3 @@ CassieWordCheck/
 
 - **Awni**
 - **虚无**
-
----
-
-> *本项目由 AI 辅助开发*
