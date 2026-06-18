@@ -33,6 +33,13 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
+  <!-- 排除测试项目目录，防止 SDK 风格项目自动包含测试源文件 -->
+  <ItemGroup>
+    <Compile Remove="CassieWordCheck.Tests\**\*.cs" />
+    <EmbeddedResource Remove="CassieWordCheck.Tests\**\*" />
+    <None Remove="CassieWordCheck.Tests\**\*" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="ClosedXML" Version="0.102.3" />

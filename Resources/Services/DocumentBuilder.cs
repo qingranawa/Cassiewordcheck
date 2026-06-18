@@ -54,11 +54,12 @@ public static class DocumentBuilder
                 FontWeight = r.Status == CheckStatus.Unavailable ? FontWeights.SemiBold : FontWeights.Normal,
             };
 
-            // 不可用词加下划线 + 悬停提示喵~
+            // 不可用词加下划线 + 悬停提示 + 存储原始检查结果喵~
             if (r.Status == CheckStatus.Unavailable)
             {
                 run.TextDecorations = TextDecorations.Underline;
-                run.ToolTip = "Not in CASSIE vocabulary";
+                run.ToolTip = null; // 移除默认 ToolTip，改用 Popup
+                run.Tag = r; // 存储 CheckResult 供 Popup 使用
             }
 
             paragraph.Inlines.Add(run);

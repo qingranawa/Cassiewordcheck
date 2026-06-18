@@ -24,6 +24,8 @@ public class Settings
     public string Theme { get; set; } = "Dark";
     public int FontSize { get; set; } = 14;
     public bool WordWrap { get; set; } = true;
+    /// <summary>结果面板排版模式：inline / list / compare 喵~</summary>
+    public string ResultMode { get; set; } = "inline";
 
     /// <param name="filePath">可自定义路径，不传则用默认喵~</param>
     public Settings(string? filePath = null)
@@ -58,6 +60,7 @@ public class Settings
             Theme = data.Theme ?? "Dark";
             FontSize = data.FontSize > 0 ? data.FontSize : 14;
             WordWrap = data.WordWrap;
+            ResultMode = data.ResultMode ?? "inline";
         }
         catch
         {
@@ -81,6 +84,7 @@ public class Settings
                 Theme = Theme,
                 FontSize = FontSize,
                 WordWrap = WordWrap,
+                ResultMode = ResultMode,
             };
             var json = JsonSerializer.Serialize(data, JsonOptions);
             File.WriteAllText(_filePath, json);
@@ -105,6 +109,7 @@ public class Settings
         public string? Theme { get; init; }
         public int FontSize { get; init; } = 14;
         public bool WordWrap { get; init; } = true;
+        public string? ResultMode { get; init; }
     }
 }
 // 喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵

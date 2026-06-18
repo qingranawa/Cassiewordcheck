@@ -196,6 +196,17 @@ public partial class Checker
         };
     }
 
+    /// <summary>统计当前检查结果中每个不可用词的出现频率喵~</summary>
+    public Dictionary<string, int> GetWordFrequency(List<CheckResult> results)
+    {
+        var freq = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var r in results.Where(r => r.Status == CheckStatus.Unavailable))
+        {
+            freq[r.Text] = freq.GetValueOrDefault(r.Text, 0) + 1;
+        }
+        return freq;
+    }
+
     // ===== 正则表达式（编译时生成，性能更好喵） =====
 
     /// <summary>匹配中文字符喵~</summary>
