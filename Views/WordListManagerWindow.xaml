@@ -1,0 +1,163 @@
+<Window x:Class="CassieWordCheck.Views.WordListManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="词库管理"
+        Width="860" Height="600"
+        MinWidth="640" MinHeight="420"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        Loaded="OnWindowLoaded">
+
+    <Border Margin="1" CornerRadius="8"
+            Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- 顶部：标签页切换 + 更换词库 -->
+            <Grid Grid.Row="0" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="BrowserTabBtn"
+                        Style="{StaticResource ModernButton}"
+                        Content="📖 浏览器" Padding="16,7" FontSize="13"
+                        Click="OnSwitchToBrowser" Tag="Active" />
+                <Button Grid.Column="1" x:Name="DiffTabBtn"
+                        Style="{StaticResource ModernButton}"
+                        Content="⇄ 对比" Padding="16,7" FontSize="13"
+                        Margin="8,0,0,0" Click="OnSwitchToDiff" />
+                <Button Grid.Column="3" Style="{StaticResource AccentButton}"
+                        Content="📂 更换词库" Padding="14,7" FontSize="12"
+                        Click="OnChangeWordList" />
+            </Grid>
+
+            <!-- 浏览器页 -->
+            <Grid x:Name="BrowserPage" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" CornerRadius="8" Background="{StaticResource BgBrush}"
+                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                        Padding="12,8" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="🔍" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBox Grid.Column="1" x:Name="SearchBox" Style="{StaticResource ModernTextBox}" FontSize="13" TextChanged="OnSearchTextChanged" />
+                        <ComboBox Grid.Column="2" x:Name="SortCombo" Style="{StaticResource ModernComboBox}" Width="140" Margin="12,0,0,0" SelectionChanged="OnSortChanged">
+                            <ComboBoxItem IsSelected="True" Content="A→Z" Tag="alpha-asc" />
+                            <ComboBoxItem Content="Z→A" Tag="alpha-desc" />
+                            <ComboBoxItem Content="短→长" Tag="length-asc" />
+                            <ComboBoxItem Content="长→短" Tag="length-desc" />
+                        </ComboBox>
+                    </Grid>
+                </Border>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" /><ColumnDefinition Width="12" /><ColumnDefinition Width="260" MinWidth="200" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" CornerRadius="8" Background="{StaticResource BgBrush}"
+                            BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="0">
+                        <Grid>
+                            <ListView x:Name="WordListView" Background="Transparent" BorderThickness="0"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.ScrollUnit="Item" Padding="4">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="6" Padding="8,4" Margin="0,0,0,2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Text}" FontSize="13" FontFamily="{StaticResource MonoFont}" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1" Text="{Binding LengthLabel}" Foreground="{StaticResource TextMutedBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}" VerticalAlignment="Center" Margin="8,0,0,0" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <TextBlock x:Name="EmptyListLabel" Text="词库为空" Foreground="{StaticResource TextMutedBrush}" FontSize="14"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                        </Grid>
+                    </Border>
+                    <Border Grid.Column="2" CornerRadius="8" Background="{StaticResource BgBrush}"
+                            BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="12">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <TextBlock x:Name="LengthDistTitle" Style="{StaticResource SectionLabel}" />
+                                <StackPanel x:Name="LengthDistPanel" Margin="0,0,0,12" />
+                                <Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,0,0,8" />
+                                <TextBlock x:Name="FirstLetterDistTitle" Style="{StaticResource SectionLabel}" />
+                                <StackPanel x:Name="FirstLetterDistPanel" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+                <Border Grid.Row="2" Margin="0,8,0,0" CornerRadius="8" Background="{StaticResource BgBrush}"
+                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="16,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <Border CornerRadius="6" Background="#1A1A2E" Padding="12,6">
+                            <TextBlock x:Name="TotalWordsLabel" Text="总词数：0" Foreground="{StaticResource AccentLightBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}" />
+                        </Border>
+                        <Border Grid.Column="1" CornerRadius="6" Background="#0A2E1A" Padding="12,6" Margin="8,0,0,0">
+                            <TextBlock x:Name="FilteredWordsLabel" Text="匹配：0" Foreground="{StaticResource SuccessBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}" />
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- 对比页 -->
+            <Grid x:Name="DiffPage" Grid.Row="1" Visibility="Collapsed">
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                <Border CornerRadius="8" Background="{StaticResource BgBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="12,8" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <TextBlock Text="对比词库：" FontSize="13" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" x:Name="DiffTargetLabel" Text="未选择" Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" VerticalAlignment="Center" Margin="8,0,0,0" />
+                        <Button Grid.Column="2" Style="{StaticResource ModernButton}" Content="📂 选择词库" Padding="12,6" FontSize="12" Click="OnSelectDiffTarget" />
+                    </Grid>
+                </Border>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="8" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                    <Border CornerRadius="8" Background="#0A2E1A" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="12,8">
+                        <Grid>
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                            <TextBlock x:Name="LeftDiffLabel" Text="仅当前词库" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SuccessBrush}" Margin="0,0,0,6" />
+                            <ListBox x:Name="LeftDiffList" Grid.Row="1" Background="Transparent" BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" FontSize="12" FontFamily="{StaticResource MonoFont}" Foreground="{StaticResource SuccessBrush}" Padding="4,2" /></DataTemplate></ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                    <Border Grid.Column="2" CornerRadius="8" Background="#2D1B1B" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="12,8">
+                        <Grid>
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                            <TextBlock x:Name="RightDiffLabel" Text="仅对比词库" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource ErrorBrush}" Margin="0,0,0,6" />
+                            <ListBox x:Name="RightDiffList" Grid.Row="1" Background="Transparent" BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" FontSize="12" FontFamily="{StaticResource MonoFont}" Foreground="{StaticResource ErrorBrush}" Padding="4,2" /></DataTemplate></ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                </Grid>
+                <Border Grid.Row="2" Margin="0,8,0,0" CornerRadius="6" Background="#1A1A2E" Padding="12,6">
+                    <TextBlock x:Name="DiffSummaryLabel" Text="选择对比词库后显示差异摘要" Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" />
+                </Border>
+            </Grid>
+
+            <Border Grid.Row="2" Margin="0,8,0,0" CornerRadius="6" Background="#1A1A2E" Padding="12,6">
+                <TextBlock x:Name="SourceInfoLabel" Foreground="{StaticResource TextMutedBrush}" FontSize="11" />
+            </Border>
+        </Grid>
+    </Border>
+</Window>

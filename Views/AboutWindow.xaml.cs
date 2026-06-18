@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using CassieWordCheck.Models;
 using CassieWordCheck.Services;
 
 namespace CassieWordCheck.Views;
@@ -36,11 +37,9 @@ public partial class AboutWindow : Window
 - **单文件自包含发布** — 无需安装 .NET 运行时
 
 ---
-
-*本项目由 AI 辅助制作*
 ";
 
-    private const string AboutInfoText = @"
+    private static readonly string AboutInfoText = $@"
 # CASSIE CWC Tool
 **CASSIE 单词检查器**
 
@@ -50,7 +49,7 @@ public partial class AboutWindow : Window
 
 ### 版本信息
 
-- **版本**：2.3.0
+- **版本**：{AppInfo.Version}
 - **框架**：.NET 8 (WPF)
 - **仓库**：[github.com/qingranawa/Cassiewordcheck](https://github.com/qingranawa/Cassiewordcheck)
 
@@ -61,8 +60,6 @@ public partial class AboutWindow : Window
 Awni、虚无
 
 ---
-
-*本项目由 AI 辅助制作*
 ";
 
     private const string DisclaimerText = @"
@@ -90,48 +87,67 @@ Awni、虚无
     private const string ChangelogText = @"
 # 更新日志
 
-## `v2.3.6`（2026-06-18）— 词库差异对比
+## `v2.3.4`（2026-06-18）— 字数统计
 
-- **新增词库对比功能** — 将当前词库与另一词库文件对比，显示新增/移除/共有词
-- **双栏差异列表** — 左栏「仅当前词库存在」，右栏「仅对比词库存在」
-- **差异报告导出** — 一键导出 .txt 格式的完整差异报告
-- **工具栏新增按钮** — ⇄ 一键打开词库对比窗口
+### 新功能
+- **新增字数统计窗口** — 工具栏新增 W 按钮，弹出独立窗口显示输入文本的详细统计
+- **字符级统计** — 总字符、有效字符（不含空格）、中文字符、英文字母、数字分类计数
+- **单词级统计** — 总单词数、唯一单词数、平均词长、词频 Top N 分布
+- **行级统计** — 总行数、非空行数
+- **词频横向条形图** — Canvas + Rectangle 渲染 Top 12 词频分布
+- **词长分布条形图** — 1-3/4-6/7-9/10+ 四桶分布，Rectangle 原生渲染
 
-## `v2.3.5`（2026-06-18）— 泰语界面支持
+### Bug 修复
+- **修复关于页 Logo 加载** — LoadAppIcon 改用 BitmapDecoder.Create 支持 .ico 格式
 
-- **新增泰语界面** — ไทย（th-TH），现有 7 语言扩展至 8 语言
+## `v2.3.3`（2026-06-18）— 替换面板 · Bug 修复
 
-## `v2.3.4`（2026-06-18）— 拼写建议增强
+### 新功能
+- **列表模式新增替换面板** — 每行勾选框选中不可用词，顶部出现替换输入框，Enter 一键替换输入文本中所有匹配词
+- **替换流程**：勾选 → 替换栏展开 → 输入替换词 → Enter（或点击""替换""）→ 自动更新检查结果
 
-- **新增智能建议引擎** — 三种匹配策略统一管理：通配搜索、编辑距离、复合拆词
-- **通配搜索** — 支持 `*`（任意多字符）和 `?`（单个字符）模式匹配词库
-- **复合拆词** — 自动识别用户连续输入的已知词组合（如 `cancelOverride`→`cancel + override`）
-- **分类建议面板** — 按来源分三区展示（通配匹配/相似拼写/拆分建议），带颜色标签
-- **点击替换** — 点击建议词自动替换输入框中对应的不可用词
-- **性能优化** — 编辑距离跳过长度差 >3 的候选，减少无谓计算
+### Bug 修复
+- **修复工具栏按钮重叠** — 设置/关于按钮渲染到最后一列导致叠加，补全 ColumnDefinitions 至 9 列
+- **修复 Logo 图片加载失败** — BitmapImage 改用 FileStream + StreamSource，提高环境兼容性
 
-## `v2.3.3`（2026-06-18）— 词库浏览器
+## `v2.3.2`（2026-06-18）— 词库可视化 · 排版模式 · 拼写增强 · 泰语 · 差异对比 · 实时加载 · 工具栏优化
 
+### 实时加载 & 版本号
+- **自动监控词库文件** — FileSystemWatcher 实时监控，修改后自动重载（500ms 防抖）
+- **移除手动重载按钮** — 不再需要手动点击 ⟳ 按钮
+- **新增 AppInfo.Version 常量** — 统一管理全局版本号
+
+### 词库可视化与管理
 - **新增词库浏览器窗口** — 可视化查看已加载词库的全部单词
 - **实时搜索过滤** — 顶部搜索框，大小写不敏感实时过滤
 - **四种排序模式** — 字母升降序、词长升降序切换
-- **词长分布柱状图** — 按词长统计单词数量，Rectangle 渲染
-- **首字母分布柱状图** — 按首字母 a-z 统计单词数量
+- **词长/首字母分布柱状图** — 统计单词分布，Rectangle 原生渲染
 - **底部状态栏** — 显示总词数 / 匹配词数
-- **主窗口工具栏新增按钮** — 📖 一键打开词库浏览器
+- **新增词库对比** — 双栏列表显示新增/移除/共有词，支持导出差异报告
+- **词库管理合并** — 浏览器与对比合并为「词库管理」，Tab 页切换
 
-## `v2.3.2`（2026-06-18）— 排版模式切换 + 单词详情弹窗
+### 排版模式切换
+- **新增排版切换** — ComboBox 支持「内嵌」「列表」「两栏对比」三种结果展示
+- **列表模式** — 逐词成行，带颜色圆点 + 状态标签
+- **两栏对比模式** — 左栏可用词 / 右栏不可用词，去重排序
+- **模式切换动画** — 淡出→淡入过渡（350ms），模式持久化到 appsettings.json
 
-- **新增排版切换** — 工具栏新增 ComboBox，支持「内嵌模式」「列表模式」「两栏对比」三种结果展示
-- **列表模式** — 逐词成行显示，带颜色圆点 + 状态标签（可用/不可用/已忽略）
-- **两栏对比模式** — 左栏可用词列表（绿色），右栏不可用词列表（红色），去重排序
-- **模式切换动画** — 切换时有淡出→淡入过渡动画（约 350ms）
-- **模式持久化** — 选择的模式保存到 `appsettings.json`，重启自动恢复
-- **新增详情弹窗** — 鼠标悬停不可用（红色）单词时弹出悬浮卡片，显示该单词详情
-- **词频统计** — 显示该单词在当前文本中出现的次数
-- **拼写建议** — 弹窗内展示 Top 3 相似词推荐
-- **防抖优化** — 鼠标快速扫过多个单词时不闪烁，离开 100ms 后自动关闭
-- **弹窗动画** — 使用 WPF Popup 原生 Fade 动画，跟随鼠标光标位置
+### 拼写建议增强
+- **智能建议引擎** — 通配搜索(*/?)、编辑距离、复合拆词三种策略
+- **复合拆词** — 自动识别连续输入的已知词组合（如 cancelOverride→cancel + override）
+- **分类建议面板** — 按来源分三区展示，点击建议词自动替换
+
+### 单词详情弹窗
+- **悬停弹窗** — 鼠标移到不可用词显示词频 + Top 3 拼写建议
+- **防抖优化** — 快速扫过不闪烁，离开 100ms 自动关闭
+
+### 泰语界面支持
+- **新增泰语界面** — ไทย（th-TH），支持语言扩展至 8 种
+
+### 工具栏 & UI 修复
+- **⚙ 设置与 ⓘ 关于移至右上角** — 释放工具栏空间，标题不再被遮挡
+- **ComboBox 显示修复** — 模式下拉列表不再显示 {text = [模式]} 错误
+- **建议面板修复** — 空文本/无可建议单词时自动隐藏
 
 ## `v2.3.1`（2026-05-03）— Bug 修复 & UI 优化
 
@@ -198,8 +214,6 @@ Awni、虚无
 - Basic settings
 
 ---
-
-*本项目由 AI 辅助制作*
 ";
 
     // 0 = Features, 1 = Changelog, 2 = AboutInfo
@@ -209,6 +223,7 @@ Awni、虚无
     public AboutWindow()
     {
         InitializeComponent();
+        VersionLabel.Text = $"版本 {AppInfo.Version}";
         this.EnableDarkTitleBar();
         ContentArea.Opacity = 1;
         ContentArea.RenderTransform = new TranslateTransform(0, 0);
@@ -268,20 +283,37 @@ Awni、虚无
     {
         try
         {
-            var paths = new[]
+            var baseDirs = new[]
             {
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "AAA.JPG"),
-                Path.Combine(Path.GetDirectoryName(Environment.ProcessPath) ?? ".", "data", "AAA.JPG"),
+                AppDomain.CurrentDomain.BaseDirectory,
+                Path.GetDirectoryName(Environment.ProcessPath) ?? ".",
+                Directory.GetCurrentDirectory(),
             };
+            var names = new[] { "AAA.JPG", "AAA.ico", "AAA.png", "app.ico" };
+            var paths = baseDirs
+                .SelectMany(dir => names.Select(name => Path.Combine(dir, "data", name)))
+                .ToArray();
             var imgPath = paths.FirstOrDefault(File.Exists);
             if (imgPath is not null)
             {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.UriSource = new Uri(imgPath);
-                bitmap.EndInit();
-                AppIconImage.Source = bitmap;
+                var ext = Path.GetExtension(imgPath).ToLowerInvariant();
+                if (ext == ".ico")
+                {
+                    using var stream = new FileStream(imgPath, FileMode.Open, FileAccess.Read);
+                    var decoder = BitmapDecoder.Create(stream,
+                        BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                    AppIconImage.Source = decoder.Frames[0];
+                }
+                else
+                {
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    using (var stream = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                        bitmap.StreamSource = stream;
+                    bitmap.EndInit();
+                    AppIconImage.Source = bitmap;
+                }
             }
         }
         catch { /* 静默 */ }

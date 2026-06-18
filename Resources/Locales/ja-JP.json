@@ -42,7 +42,6 @@
   "suggestion.no_match": "辞書に類似語なし",
   "menu.copy_result": "結果をコピー",
   "menu.copy_broadcast": "放送文をコピー",
-  "menu.copy_broadcast": "放送文をコピー",
   "menu.reload_wordlist": "単語リストを再読み込み",
   "menu.statistics": "統計",
   "menu.import_words": "単語をインポート",
@@ -97,5 +96,19 @@
   "diff.done": "{0} を読み込みました、差分: 左のみ {1} 語、右のみ {2} 語、共通 {3} 語",
   "diff.exported": "差分レポートをエクスポートしました",
   "diff.error": "操作に失敗しました",
-  "diff.empty_file": "選択したファイルに有効な単語が含まれていません"
+  "diff.empty_file": "選択したファイルに有効な単語が含まれていません",
+  "menu.wordcount": "W Word Count",
+  "wordcount.freq": "Word Frequency",
+  "wordcount.length": "Word Length",
+  "wordcount.total_chars": "Total Characters",
+  "wordcount.chars_no_spaces": "Chars (No Spaces)",
+  "wordcount.chinese_chars": "Chinese Characters",
+  "wordcount.english_letters": "English Letters",
+  "wordcount.digit_chars": "Digits",
+  "wordcount.total_words": "Total Words",
+  "wordcount.unique_words": "Unique Words",
+  "wordcount.avg_length": "Avg Length",
+  "wordcount.total_lines": "Total Lines",
+  "wordcount.nonempty_lines": "Non-Empty Lines",
+  "replace.find": "Find"
 }

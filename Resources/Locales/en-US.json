@@ -101,5 +101,22 @@
   "diff.done": "Loaded {0}, diff: {1} left-only, {2} right-only, {3} common",
   "diff.exported": "Diff report exported",
   "diff.error": "Operation failed",
-  "diff.empty_file": "The selected file contains no valid words"
+  "diff.empty_file": "The selected file contains no valid words",
+  "replace.to": "Replace with",
+  "replace.replace": "Replace",
+  "replace.label": "Replace \"{0}\" with:",
+  "menu.wordcount": "Word Count",
+  "wordcount.freq": "Word Frequency",
+  "wordcount.length": "Word Length Distribution",
+  "wordcount.total_chars": "Total Characters",
+  "wordcount.chars_no_spaces": "Chars (No Spaces)",
+  "wordcount.chinese_chars": "Chinese Characters",
+  "wordcount.english_letters": "English Letters",
+  "wordcount.digit_chars": "Digits",
+  "wordcount.total_words": "Total Words",
+  "wordcount.unique_words": "Unique Words",
+  "wordcount.avg_length": "Avg Length",
+  "wordcount.total_lines": "Total Lines",
+  "wordcount.nonempty_lines": "Non-Empty Lines",
+  "replace.find": "Find"
 }

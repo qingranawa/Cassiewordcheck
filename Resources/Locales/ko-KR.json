@@ -96,5 +96,19 @@
   "diff.done": "{0} 로드 완료, 차이: 왼쪽만 {1}개, 오른쪽만 {2}개, 공통 {3}개",
   "diff.exported": "차이 보고서 내보내기 완료",
   "diff.error": "작업 실패",
-  "diff.empty_file": "선택한 파일에 유효한 단어가 없습니다"
+  "diff.empty_file": "선택한 파일에 유효한 단어가 없습니다",
+  "menu.wordcount": "W Word Count",
+  "wordcount.freq": "Word Frequency",
+  "wordcount.length": "Word Length",
+  "wordcount.total_chars": "Total Characters",
+  "wordcount.chars_no_spaces": "Chars (No Spaces)",
+  "wordcount.chinese_chars": "Chinese Characters",
+  "wordcount.english_letters": "English Letters",
+  "wordcount.digit_chars": "Digits",
+  "wordcount.total_words": "Total Words",
+  "wordcount.unique_words": "Unique Words",
+  "wordcount.avg_length": "Avg Length",
+  "wordcount.total_lines": "Total Lines",
+  "wordcount.nonempty_lines": "Non-Empty Lines",
+  "replace.find": "Find"
 }

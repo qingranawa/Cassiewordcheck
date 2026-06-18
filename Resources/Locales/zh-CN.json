@@ -101,5 +101,22 @@
   "diff.done": "已加载 {0}，差异：左侧独有 {1} 词，右侧独有 {2} 词，共有 {3} 词",
   "diff.exported": "差异报告已导出",
   "diff.error": "操作失败",
-  "diff.empty_file": "选择的文件不包含有效单词"
+  "diff.empty_file": "选择的文件不包含有效单词",
+  "replace.to": "替换为",
+  "replace.replace": "替换",
+  "replace.label": "替换「{0}」为：",
+  "menu.wordcount": "W 字数统计",
+  "wordcount.freq": "词频分布",
+  "wordcount.length": "词长分布",
+  "wordcount.total_chars": "总字符",
+  "wordcount.chars_no_spaces": "有效字符（不含空格）",
+  "wordcount.chinese_chars": "中文字符",
+  "wordcount.english_letters": "英文字母",
+  "wordcount.digit_chars": "数字",
+  "wordcount.total_words": "总单词",
+  "wordcount.unique_words": "唯一单词",
+  "wordcount.avg_length": "平均词长",
+  "wordcount.total_lines": "总行数",
+  "wordcount.nonempty_lines": "非空行",
+  "replace.find": "查找"
 }

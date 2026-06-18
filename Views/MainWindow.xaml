@@ -11,158 +11,151 @@
         Loaded="OnMainWindowLoaded">
 
     <Grid Margin="24,16,24,16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <!-- ── Toolbar Card (joined with status info) ──────────────── -->
-        <Border x:Name="ToolbarCard" Grid.Row="0"
-                Background="{StaticResource SurfaceBrush}"
-                BorderBrush="{StaticResource BorderBrush}"
-                BorderThickness="1"
-                CornerRadius="12"
-                Margin="0,0,0,6"
-                Padding="0">
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="14" Opacity="0.3" ShadowDepth="4" Direction="270" Color="#000000" />
-            </Border.Effect>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <!-- ── Toolbar Card (joined with status info) ──────────────── -->
+            <Border x:Name="ToolbarCard" Grid.Row="0"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Margin="0,0,0,6"
+                    Padding="0">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="14" Opacity="0.3" ShadowDepth="4" Direction="270" Color="#000000" />
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <!-- Top row: toolbar buttons -->
-                <Grid Grid.Row="0" Margin="20,0,20,0" Height="48">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                    <!-- Top row: toolbar buttons -->
+                    <Grid Grid.Row="0" Margin="20,0,20,0" Height="48">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0"
-                            Width="28" Height="28"
-                            CornerRadius="8"
-                            Background="Transparent"
-                            VerticalAlignment="Center">
-                        <Image x:Name="ToolbarIcon" Width="28" Height="28"
-                               Stretch="UniformToFill" />
-                    </Border>
+                        <Border Grid.Column="0"
+                                Width="28" Height="28"
+                                CornerRadius="6"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="1"
+                                Background="Transparent"
+                                VerticalAlignment="Center">
+                            <Image x:Name="ToolbarIcon" Width="24" Height="24"
+                                   Stretch="UniformToFill" />
+                        </Border>
 
-                    <TextBlock Grid.Column="1"
-                               Text="CASSIE Word Checker"
-                               Foreground="{StaticResource TextPrimaryBrush}"
-                               FontSize="14" FontWeight="SemiBold"
-                               VerticalAlignment="Center"
-                               Margin="12,0,0,0" />
+                        <TextBlock Grid.Column="1"
+                                   Text="CASSIE Word Checker"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   FontSize="14" FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Margin="12,0,0,0" />
 
-                    <Button Grid.Column="2"
-                            x:Name="WhitelistButton"
-                            Style="{StaticResource ModernButton}"
-                            Content="⊞ 白名单"
-                            Margin="0,0,10,0"
-                            Padding="14,6"
-                            VerticalAlignment="Center"
-                            Click="OnOpenWhitelist" />
+                        <Button Grid.Column="2"
+                                x:Name="WhitelistButton"
+                                Style="{StaticResource ModernButton}"
+                                Content="⊞ 白名单"
+                                Margin="0,0,10,0"
+                                Padding="14,6"
+                                VerticalAlignment="Center"
+                                Click="OnOpenWhitelist" />
 
-                    <Button Grid.Column="3"
-                            x:Name="SettingsButton"
-                            Style="{StaticResource ModernButton}"
-                            Content="⚙ 设置"
-                            Padding="14,6"
-                            Margin="0,0,10,0"
-                            VerticalAlignment="Center"
-                            Click="OnOpenSettings" />
+                        <ComboBox Grid.Column="3"
+                                  x:Name="ModeCombo"
+                                  Style="{StaticResource ModernComboBox}"
+                                  Width="110"
+                                  Margin="4,0,8,0"
+                                  VerticalAlignment="Center"
+                                  SelectionChanged="OnModeChanged" />
 
-                    <Button Grid.Column="4"
-                            x:Name="ReloadButton"
-                            Style="{StaticResource ModernButton}"
-                            Content="⟳"
-                            Padding="10,6"
-                            Margin="0,0,10,0"
-                            VerticalAlignment="Center"
-                            FontSize="16"
-                            ToolTip="重新加载词库"
-                            Click="OnReloadWordlist" />
+                        <Button Grid.Column="4"
+                                x:Name="StatsButton"
+                                Style="{StaticResource ModernButton}"
+                                Content="📊"
+                                Padding="8,6"
+                                Width="32"
+                                FontSize="15"
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                ToolTip="统计面板"
+                                Click="OnOpenStatistics" />
 
-                    <Button Grid.Column="5"
-                            x:Name="AboutButton"
-                            Style="{StaticResource ModernButton}"
-                            Content="ⓘ"
-                            Padding="8,6"
-                            Width="32"
-                            FontSize="15"
-                            VerticalAlignment="Center"
-                            ToolTip="关于"
-                            Click="OnOpenAbout" />
+                        <Button Grid.Column="5"
+                                x:Name="HistoryButton"
+                                Style="{StaticResource ModernButton}"
+                                Content="🕐"
+                                Padding="8,6"
+                                Width="32"
+                                FontSize="15"
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                ToolTip="检查历史"
+                                Click="OnToggleHistory" />
 
-                    <ComboBox Grid.Column="6"
-                              x:Name="ModeCombo"
-                              Style="{StaticResource ModernComboBox}"
-                              Width="110"
-                              Margin="4,0,8,0"
-                              VerticalAlignment="Center"
-                              SelectionChanged="OnModeChanged" />
+                        <Button Grid.Column="6"
+                                x:Name="WordCountButton"
+                                Style="{StaticResource ModernButton}"
+                                Content="W"
+                                Padding="8,6"
+                                Width="32"
+                                FontSize="14" FontWeight="SemiBold"
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                ToolTip="字数统计"
+                                Click="OnOpenWordCount" />
 
-                    <Button Grid.Column="7"
-                            x:Name="StatsButton"
-                            Style="{StaticResource ModernButton}"
-                            Content="📊"
-                            Padding="8,6"
-                            Width="32"
-                            FontSize="15"
-                            Margin="4,0,0,0"
-                            VerticalAlignment="Center"
-                            ToolTip="统计面板"
-                            Click="OnOpenStatistics" />
+                        <Button Grid.Column="7"
+                                x:Name="WordListBrowserButton"
+                                Style="{StaticResource ModernButton}"
+                                Content="词库管理"
+                                Padding="14,6"
+                                FontSize="13"
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                ToolTip="词库管理"
+                                Click="OnOpenWordListBrowser" />
 
-                    <Button Grid.Column="8"
-                            x:Name="HistoryButton"
-                            Style="{StaticResource ModernButton}"
-                            Content="🕐"
-                            Padding="8,6"
-                            Width="32"
-                            FontSize="15"
-                            Margin="4,0,0,0"
-                            VerticalAlignment="Center"
-                            ToolTip="检查历史"
-                            Click="OnToggleHistory" />
+	                        <Button Grid.Column="8"
+	                                x:Name="SettingsButton"
+	                                Style="{StaticResource ModernButton}"
+	                                Content="⚙"
+	                                Padding="8,6"
+	                                Width="32"
+	                                FontSize="15"
+	                                Margin="4,0,0,0"
+	                                VerticalAlignment="Center"
+	                                ToolTip="设置"
+	                                Click="OnOpenSettings" />
 
-                    <Button Grid.Column="9"
-                            x:Name="WordListBrowserButton"
-                            Style="{StaticResource ModernButton}"
-                            Content="📖"
-                            Padding="8,6"
-                            Width="32"
-                            FontSize="15"
-                            Margin="4,0,0,0"
-                            VerticalAlignment="Center"
-                            ToolTip="词库浏览器"
-                            Click="OnOpenWordListBrowser" />
-
-                    <Button Grid.Column="10"
-                            x:Name="DiffButton"
-                            Style="{StaticResource ModernButton}"
-                            Content="⇄"
-                            Padding="8,6"
-                            Width="32"
-                            FontSize="15"
-                            Margin="4,0,0,0"
-                            VerticalAlignment="Center"
-                            ToolTip="词库对比"
-                            Click="OnOpenDiff" />
-                </Grid>
+	                        <Button Grid.Column="9"
+	                                x:Name="AboutButton"
+	                                Style="{StaticResource ModernButton}"
+	                                Content="ⓘ"
+	                                Padding="8,6"
+	                                Width="32"
+	                                FontSize="15"
+	                                Margin="4,0,0,0"
+	                                VerticalAlignment="Center"
+	                                ToolTip="关于"
+	                                Click="OnOpenAbout" />
+                    </Grid>
 
                 <!-- Separator + status line -->
                 <Grid Grid.Row="1" Margin="0,0,0,0">
@@ -246,7 +239,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Ellipse Grid.Column="0" Width="8" Height="8" Fill="{StaticResource AccentBrush}" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" x:Name="InputLabel" Text="广播文本"
+                            <TextBlock Grid.Column="1" x:Name="InputLabel" Text="输入框"
                                        Style="{StaticResource SectionLabel}"
                                        Margin="8,0,0,0"
                                        VerticalAlignment="Center" />
@@ -310,6 +303,7 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -348,12 +342,76 @@
                                     Padding="10,3"
                                     FontSize="11"
                                     Click="OnCopyResult" />
+                            <Button Grid.Column="4"
+                                    x:Name="ResultReplaceButton"
+                                    Style="{StaticResource ModernButton}"
+                                    Content="替换"
+                                    Padding="10,3"
+                                    FontSize="11"
+                                    Margin="4,0,0,0"
+                                    Click="OnToggleResultReplace" />
+                        </Grid>
+                    </Border>
+
+                    <!-- 替换栏（跨模式） -->
+                    <Border x:Name="ResultReplaceBar"
+                            Grid.Row="1"
+                            Visibility="Collapsed"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="0,0,0,1"
+                            Padding="16,8"
+                            Background="{StaticResource SurfaceBrush}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       x:Name="ResultReplaceFindLabel"
+                                       Text="查找："
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="13" />
+                            <TextBox x:Name="ResultReplaceFindBox" Grid.Column="1"
+                                     Style="{StaticResource ModernTextBox}"
+                                     Margin="6,0,12,0" Padding="6,4"
+                                     FontSize="13"
+                                     FontFamily="{StaticResource MonoFont}" />
+                            <TextBlock Grid.Column="2"
+                                       x:Name="ResultReplaceToLabel"
+                                       Text="替换为："
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="13" />
+                            <TextBox x:Name="ResultReplaceToBox" Grid.Column="3"
+                                     Style="{StaticResource ModernTextBox}"
+                                     Margin="6,0,8,0" Padding="6,4"
+                                     FontSize="13"
+                                     FontFamily="{StaticResource MonoFont}"
+                                     KeyDown="OnResultReplaceKeyDown" />
+                            <Button x:Name="ResultReplaceGoButton" Grid.Column="4"
+                                    Style="{StaticResource ModernButton}"
+                                    Content="替换"
+                                    Padding="10,4"
+                                    FontSize="12"
+                                    Click="OnResultReplaceConfirm" />
+                            <Button Grid.Column="5"
+                                    Style="{StaticResource ModernButton}"
+                                    Content="✕"
+                                    Width="24" Height="24"
+                                    Padding="0" Margin="4,0,0,0"
+                                    FontSize="12"
+                                    Click="OnResultReplaceDismiss" />
                         </Grid>
                     </Border>
 
                     <!-- Result display -->
                     <RichTextBox x:Name="ResultBox"
-                                 Grid.Row="1"
+                                 Grid.Row="2"
                                  Style="{StaticResource ModernRichTextBox}"
                                  BorderThickness="0"
                                  Background="Transparent"
@@ -363,54 +421,111 @@
                                  IsReadOnly="True" />
 
                     <!-- 列表模式（每个单词一行） -->
-                    <ListView x:Name="ResultListView"
-                              Visibility="Collapsed"
-                              Grid.Row="1"
-                              Background="Transparent"
-                              BorderThickness="0"
-                              ScrollViewer.VerticalScrollBarVisibility="Auto"
-                              Padding="16,12"
-                              FontSize="14"
-                              FontFamily="{StaticResource MonoFont}">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Border CornerRadius="6" Padding="8,4" Margin="0,0,0,2"
-                                        Background="{StaticResource SurfaceBrush}"
-                                        BorderBrush="{StaticResource BorderBrush}"
-                                        BorderThickness="1">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <Ellipse Width="8" Height="8"
-                                                 Fill="{Binding StatusColor}"
-                                                 VerticalAlignment="Center" />
-                                        <TextBlock Grid.Column="1" Text="{Binding Text}"
-                                                   FontSize="14"
-                                                   FontFamily="{StaticResource MonoFont}"
-                                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                                   Margin="10,0,0,0"
-                                                   VerticalAlignment="Center" />
-                                        <Border Grid.Column="2"
-                                                CornerRadius="4" Padding="6,2"
-                                                Background="{Binding StatusBg}"
-                                                VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding StatusLabel}"
-                                                       FontSize="11"
-                                                       Foreground="{Binding StatusColor}" />
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                    <Grid x:Name="ListViewContainer"
+                          Visibility="Collapsed"
+                          Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- 替换栏 -->
+                        <Border x:Name="ReplaceBar" Grid.Row="0"
+                                Visibility="Collapsed"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="0,0,0,1"
+                                Padding="16,8"
+                                Background="{StaticResource SurfaceBrush}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                           x:Name="ReplaceBarLabel"
+                                           VerticalAlignment="Center"
+                                           Foreground="{StaticResource AccentLightBrush}"
+                                           FontSize="13" />
+                                <TextBox x:Name="ReplaceInput" Grid.Column="1"
+                                         Style="{StaticResource ModernTextBox}"
+                                         Margin="8,0" Padding="6,4"
+                                         FontSize="13"
+                                         FontFamily="{StaticResource MonoFont}"
+                                         KeyDown="OnReplaceInputKeyDown" />
+                                <Button x:Name="ReplaceConfirmButton" Grid.Column="2"
+                                        Style="{StaticResource ModernButton}"
+                                        Content="替换"
+                                        Padding="10,4"
+                                        FontSize="12"
+                                        Click="OnReplaceConfirm" />
+                                <Button Grid.Column="3"
+                                        Style="{StaticResource ModernButton}"
+                                        Content="✕"
+                                        Width="24" Height="24"
+                                        Padding="0" Margin="4,0,0,0"
+                                        FontSize="12"
+                                        Click="OnReplaceDismiss" />
+                            </Grid>
+                        </Border>
+
+                        <ListView x:Name="ResultListView" Grid.Row="1"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  VirtualizingPanel.IsVirtualizing="False"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  Padding="16,12"
+                                  FontSize="14"
+                                  FontFamily="{StaticResource MonoFont}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="6" Padding="8,4" Margin="0,0,0,2"
+                                            Background="{StaticResource SurfaceBrush}"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            BorderThickness="1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Grid.Column="0"
+                                                      Style="{StaticResource ModernCheckBox}"
+                                                      Tag="{Binding Text}"
+                                                      VerticalAlignment="Center"
+                                                      Margin="0,0,6,0"
+                                                      Checked="OnReplaceCheckChanged"
+                                                      Unchecked="OnReplaceCheckChanged" />
+                                            <Ellipse Grid.Column="1" Width="8" Height="8"
+                                                     Fill="{Binding StatusColor}"
+                                                     VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Text}"
+                                                       FontSize="14"
+                                                       FontFamily="{StaticResource MonoFont}"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                                       Margin="10,0,0,0"
+                                                       VerticalAlignment="Center" />
+                                            <Border Grid.Column="3"
+                                                    CornerRadius="4" Padding="6,2"
+                                                    Background="{Binding StatusBg}"
+                                                    VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding StatusLabel}"
+                                                           FontSize="11"
+                                                           Foreground="{Binding StatusColor}" />
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
 
                     <!-- 两栏对比模式 -->
                     <Grid x:Name="ResultCompareGrid"
                           Visibility="Collapsed"
-                          Grid.Row="1"
+                          Grid.Row="2"
                           Margin="16,12,16,12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />

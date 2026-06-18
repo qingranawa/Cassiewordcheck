@@ -105,5 +105,19 @@
   "diff.done": "{0} chargé, différences : {1} gauche seulement, {2} droite seulement, {3} communs",
   "diff.exported": "Rapport de différences exporté",
   "diff.error": "Échec de l'opération",
-  "diff.empty_file": "Le fichier sélectionné ne contient aucun mot valide"
+  "diff.empty_file": "Le fichier sélectionné ne contient aucun mot valide",
+  "menu.wordcount": "W Word Count",
+  "wordcount.freq": "Word Frequency",
+  "wordcount.length": "Word Length",
+  "wordcount.total_chars": "Total Characters",
+  "wordcount.chars_no_spaces": "Chars (No Spaces)",
+  "wordcount.chinese_chars": "Chinese Characters",
+  "wordcount.english_letters": "English Letters",
+  "wordcount.digit_chars": "Digits",
+  "wordcount.total_words": "Total Words",
+  "wordcount.unique_words": "Unique Words",
+  "wordcount.avg_length": "Avg Length",
+  "wordcount.total_lines": "Total Lines",
+  "wordcount.nonempty_lines": "Non-Empty Lines",
+  "replace.find": "Find"
 }

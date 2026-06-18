@@ -19,7 +19,7 @@ public record WordListDiff(
 /// 词库——用 FrozenSet 做 O(1) 查询，加载后不可变喵~
 /// 支持白名单、多格式导入（TXT/CSV/Excel）喵
 /// </summary>
-public partial class WordList
+public partial class WordList : IDisposable
 {
     // 核心词库，加载后不可变，查询极快喵！
     private FrozenSet<string> _words = FrozenSet<string>.Empty;
@@ -27,14 +27,30 @@ public partial class WordList
     // 白名单——用户手动添加的豁免词，运行时可变喵~
     private HashSet<string> _whitelist = [];
 
+    // 排除列表——用户手动标记要隐藏的词（即使词库中有），运行时可变喵~
+    private readonly HashSet<string> _excludeList = new(StringComparer.OrdinalIgnoreCase);
+
     // 当前词库文件的路径，重载时需要喵~
     private string? _sourcePath;
+
+    // === 文件系统监控 ===
+    private FileSystemWatcher? _watcher;
+    private System.Timers.Timer? _debounceTimer;
+    private const int DebounceDelayMs = 500;
+
+    /// <summary>词库文件变更时触发（已自动重载）喵~</summary>
+    public event Action? WordListChanged;
 
     public int WordCount => _words.Count;
     public int WhitelistCount => _whitelist.Count;
     public string? SourcePath => _sourcePath;
     public IReadOnlySet<string> Words => _words;
     public IReadOnlySet<string> Whitelist => _whitelist;
+
+    /// <summary>排除列表的只读视图喵~</summary>
+    public IReadOnlySet<string> ExcludeList => _excludeList;
+    /// <summary>排除列表中的词数喵~</summary>
+    public int ExcludeCount => _excludeList.Count;
 
     /// <summary>从文件加载词库（先清空再加载）喵~</summary>
     public int LoadFromFile(string path)
@@ -65,6 +81,7 @@ public partial class WordList
         // 转为 FrozenSet，之后不可变，查询性能更好喵！
         _words = words.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
         _sourcePath = path;
+        SetupWatcher();
         return _words.Count;
     }
 
@@ -90,7 +107,11 @@ public partial class WordList
     {
         var w = word.Trim();
         if (w.Length == 0) return true;
-        return _words.Contains(w) || _whitelist.Contains(w);
+        // 白名单优先于排除列表：白名单中的词始终可用喵~
+        if (_whitelist.Contains(w)) return true;
+        // 排除列表优先级高于词库：被排除的词即使词库中有也返回 false 喵~
+        if (_excludeList.Contains(w)) return false;
+        return _words.Contains(w);
     }
 
     /// <summary>添加单词到白名单喵~</summary>
@@ -119,6 +140,89 @@ public partial class WordList
     public void ClearWhitelist()
     {
         _whitelist.Clear();
+    }
+
+    /// <summary>将单词加入排除列表喵~</summary>
+    public bool Exclude(string word)
+    {
+        var w = word.Trim().ToLowerInvariant();
+        return w.Length > 0 && _excludeList.Add(w);
+    }
+
+    /// <summary>从排除列表移除单词喵~</summary>
+    public bool UnExclude(string word)
+    {
+        return _excludeList.Remove(word.Trim().ToLowerInvariant());
+    }
+
+    /// <summary>清空排除列表喵~</summary>
+    public void ClearExclude()
+    {
+        _excludeList.Clear();
+    }
+
+    // ── 文件系统监控（自动重载） ─────────────────────────────
+
+    /// <summary>设置或重启 FileSystemWatcher，监控词库文件变化喵~</summary>
+    private void SetupWatcher()
+    {
+        _watcher?.Dispose();
+        _debounceTimer?.Dispose();
+
+        if (_sourcePath is null) return;
+
+        var dir = Path.GetDirectoryName(_sourcePath);
+        if (string.IsNullOrEmpty(dir) || !Directory.Exists(dir)) return;
+
+        _watcher = new FileSystemWatcher(dir)
+        {
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
+            Filter = Path.GetFileName(_sourcePath),
+            EnableRaisingEvents = true,
+        };
+
+        _debounceTimer = new System.Timers.Timer(DebounceDelayMs)
+        {
+            AutoReset = false,
+        };
+        _debounceTimer.Elapsed += OnDebounceElapsed;
+
+        _watcher.Changed += OnFileChanged;
+        _watcher.Created += OnFileChanged;
+    }
+
+    /// <summary>文件变更时触发，重启防抖计时器喵~</summary>
+    private void OnFileChanged(object sender, FileSystemEventArgs e)
+    {
+        _debounceTimer?.Stop();
+        _debounceTimer?.Start();
+    }
+
+    /// <summary>防抖到期后执行重载并通知 UI 喵~</summary>
+    private void OnDebounceElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        try
+        {
+            Reload();
+            WordListChanged?.Invoke();
+        }
+        catch
+        {
+            // 静默处理重载异常
+        }
+    }
+
+    /// <summary>释放文件监控资源喵~</summary>
+    public void Dispose()
+    {
+        _watcher?.Dispose();
+        _debounceTimer?.Dispose();
+    }
+
+    /// <summary>检查单词是否在排除列表中喵~</summary>
+    public bool IsExcluded(string word)
+    {
+        return _excludeList.Contains(word.Trim().ToLowerInvariant());
     }
 
     [GeneratedRegex(@"\s+")]

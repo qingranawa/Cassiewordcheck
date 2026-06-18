@@ -28,8 +28,10 @@ public partial class MainWindow : Window
     private string _snapshotResult = "";
     private int _snapshotAvailable, _snapshotUnavailable, _snapshotIgnored;
     private double _snapshotCoverage;
-    // 结果面板排版模式（inline / list / compare）
+    // 当前排版模式
     private string _currentMode = "inline";
+    // 替换面板：当前勾选的待替换词
+    private string? _replaceCheckedWord;
     // 当前文本每个不可用词的出现频率（由 UpdateResult 计算）
     private Dictionary<string, int> _currentWordFreq = new(StringComparer.OrdinalIgnoreCase);
     // 弹窗防抖计时器（鼠标快速扫过单词时不反复闪烁）
@@ -40,6 +42,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         _wordlist = new WordList();
+        _wordlist.WordListChanged += OnWordListChanged;
         _checker = new Checker(_wordlist);
         _settings = new Settings();
         _localization = new LocalizationService();
@@ -88,6 +91,9 @@ public partial class MainWindow : Window
             _popupDebounceTimer.Stop();
             WordDetailPopup.IsOpen = false;
         };
+
+        // 窗口关闭时释放文件监控资源
+        Closed += (_, _) => (_wordlist as IDisposable)?.Dispose();
     }
 
     // ── 入场动画（错峰播放，减少同时并发）─────────────────────────
@@ -153,16 +159,30 @@ public partial class MainWindow : Window
             {
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "AAA.JPG"),
                 Path.Combine(Path.GetDirectoryName(Environment.ProcessPath) ?? ".", "data", "AAA.JPG"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "AAA.ico"),
+                Path.Combine(Path.GetDirectoryName(Environment.ProcessPath) ?? ".", "data", "AAA.ico"),
             };
             var imgPath = paths.FirstOrDefault(File.Exists);
             if (imgPath is not null)
             {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.UriSource = new Uri(imgPath);
-                bitmap.EndInit();
-                ToolbarIcon.Source = bitmap;
+                var ext = Path.GetExtension(imgPath).ToLowerInvariant();
+                if (ext == ".ico")
+                {
+                    using var stream = new FileStream(imgPath, FileMode.Open, FileAccess.Read);
+                    var decoder = BitmapDecoder.Create(stream,
+                        BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                    ToolbarIcon.Source = decoder.Frames[0];
+                }
+                else
+                {
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    using (var stream = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                        bitmap.StreamSource = stream;
+                    bitmap.EndInit();
+                    ToolbarIcon.Source = bitmap;
+                }
             }
         }
         catch { /* 静默 */ }
@@ -251,6 +271,17 @@ public partial class MainWindow : Window
 
         // 建议面板 + 卡片整体上移动画（清空/退格时跳过）
         if (_suppressAnimation) return;
+
+        // 文本为空时跳过建议面板显示
+        if (text.Length == 0)
+        {
+            if (SuggestionsPanel.Visibility == Visibility.Visible)
+            {
+                SuggestionsPanel.Visibility = Visibility.Collapsed;
+                SuggestionsPanel.Opacity = 0;
+            }
+            return;
+        }
 
         var unavailableWords = results
             .Where(r => r.Status == CheckStatus.Unavailable)
@@ -404,23 +435,23 @@ public partial class MainWindow : Window
     private void PopulateModeCombo()
     {
         ModeCombo.Items.Clear();
-        // 使用匿名类型 + SelectedValuePath 实现 ComboBox 值绑定
-        var modes = new[]
+        ModeCombo.Items.Add(new ComboBoxItem { Content = _localization["mode.inline"], Tag = "inline" });
+        ModeCombo.Items.Add(new ComboBoxItem { Content = _localization["mode.list"], Tag = "list" });
+        ModeCombo.Items.Add(new ComboBoxItem { Content = _localization["mode.compare"], Tag = "compare" });
+        // 选中当前模式
+        foreach (ComboBoxItem item in ModeCombo.Items)
         {
-            new { Text = _localization["mode.inline"], Value = "inline" },
-            new { Text = _localization["mode.list"], Value = "list" },
-            new { Text = _localization["mode.compare"], Value = "compare" },
-        };
-        foreach (var m in modes)
-            ModeCombo.Items.Add(m);
-        ModeCombo.SelectedValuePath = "Value";
-        ModeCombo.DisplayMemberPath = "Text";
-        ModeCombo.SelectedValue = _currentMode;
+            if (item.Tag?.ToString() == _currentMode)
+            {
+                item.IsSelected = true;
+                break;
+            }
+        }
     }
 
     private void OnModeChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (ModeCombo.SelectedValue is string mode && mode != _currentMode)
+        if (ModeCombo.SelectedItem is ComboBoxItem item && item.Tag is string mode && mode != _currentMode)
         {
             _currentMode = mode;
             _settings.ResultMode = mode;
@@ -445,8 +476,12 @@ public partial class MainWindow : Window
         {
             timer.Stop();
             ResultBox.Visibility = mode == "inline" ? Visibility.Visible : Visibility.Collapsed;
-            ResultListView.Visibility = mode == "list" ? Visibility.Visible : Visibility.Collapsed;
+            ListViewContainer.Visibility = mode == "list" ? Visibility.Visible : Visibility.Collapsed;
             ResultCompareGrid.Visibility = mode == "compare" ? Visibility.Visible : Visibility.Collapsed;
+
+            // 切换模式时隐藏所有替换栏
+            if (mode != "list") ReplaceBar.Visibility = Visibility.Collapsed;
+            ResultReplaceBar.Visibility = Visibility.Collapsed;
 
             foreach (var v in activeViews)
             {
@@ -458,6 +493,112 @@ public partial class MainWindow : Window
             }
         };
         timer.Start();
+    }
+
+    // ── 替换面板：勾选词 → 显示替换栏 ─────────────────────
+    private void OnReplaceCheckChanged(object sender, RoutedEventArgs e)
+    {
+        if (sender is CheckBox cb && cb.Tag is string word)
+        {
+            if (cb.IsChecked == true)
+            {
+                _replaceCheckedWord = word;
+                ReplaceBarLabel.Text = string.Format(_localization["replace.label"], word);
+                ReplaceInput.Text = "";
+                ReplaceBar.Visibility = Visibility.Visible;
+                ReplaceInput.Focus();
+            }
+            else if (_replaceCheckedWord == word)
+            {
+                _replaceCheckedWord = null;
+                ReplaceBar.Visibility = Visibility.Collapsed;
+            }
+        }
+    }
+
+    private void OnReplaceConfirm(object sender, RoutedEventArgs e) => DoReplace();
+
+    private void OnReplaceInputKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            DoReplace();
+            e.Handled = true;
+        }
+    }
+
+    private void OnReplaceDismiss(object sender, RoutedEventArgs e)
+    {
+        _replaceCheckedWord = null;
+        ReplaceBar.Visibility = Visibility.Collapsed;
+    }
+
+    private void DoReplace()
+    {
+        if (string.IsNullOrWhiteSpace(_replaceCheckedWord) || string.IsNullOrWhiteSpace(ReplaceInput.Text))
+            return;
+
+        var oldWord = _replaceCheckedWord;
+        var newWord = ReplaceInput.Text.Trim();
+        var currentText = InputBox.Text;
+
+        if (!currentText.Contains(oldWord, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        PushUndo();
+        InputBox.Text = currentText.Replace(oldWord, newWord, StringComparison.OrdinalIgnoreCase);
+
+        // 替换栏自动隐藏，结果由 InputTextChanged → 防抖 → UpdateResult 自动更新
+        _replaceCheckedWord = null;
+        ReplaceBar.Visibility = Visibility.Collapsed;
+    }
+
+    // ── 结果面板替换栏（跨模式：查找 + 替换）─────────────────
+    private void OnToggleResultReplace(object sender, RoutedEventArgs e)
+    {
+        if (ResultReplaceBar.Visibility == Visibility.Visible)
+        {
+            ResultReplaceBar.Visibility = Visibility.Collapsed;
+            return;
+        }
+        ResultReplaceBar.Visibility = Visibility.Visible;
+        ResultReplaceFindBox.Text = "";
+        ResultReplaceToBox.Text = "";
+        ResultReplaceFindBox.Focus();
+    }
+
+    private void OnResultReplaceKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            DoResultReplace();
+            e.Handled = true;
+        }
+    }
+
+    private void OnResultReplaceConfirm(object sender, RoutedEventArgs e) => DoResultReplace();
+
+    private void OnResultReplaceDismiss(object sender, RoutedEventArgs e)
+    {
+        ResultReplaceBar.Visibility = Visibility.Collapsed;
+    }
+
+    private void DoResultReplace()
+    {
+        var findText = ResultReplaceFindBox.Text.Trim();
+        var replaceText = ResultReplaceToBox.Text;
+
+        if (string.IsNullOrEmpty(findText))
+            return;
+
+        var currentText = InputBox.Text;
+        if (!currentText.Contains(findText, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        PushUndo();
+        InputBox.Text = currentText.Replace(findText, replaceText, StringComparison.OrdinalIgnoreCase);
+
+        // 不自动关闭替换栏，方便连续替换
     }
 
     private void BuildModeViews(List<CheckResult> results)
@@ -639,6 +780,8 @@ public partial class MainWindow : Window
                         WordlistPathLink.Inlines.Clear();
                         WordlistPathLink.Inlines.Add(new System.Windows.Documents.Run(
                             string.IsNullOrEmpty(path) ? "—" : Path.GetFileName(path)));
+                        // 词库加载完成后重新创建建议引擎，确保引擎持有完整词库（而非构造函数中的空集）
+                        _suggestionEngine = new SuggestionEngine(_wordlist.Words);
                     });
                 }
                 else
@@ -662,17 +805,22 @@ public partial class MainWindow : Window
         if (_localization.CurrentLanguage != "en-US")
             settingsLabel += " (settings)";
         WhitelistButton.Content = $"⊞ {_localization["whitelist.title"]}";
-        SettingsButton.Content = $"⚙ {settingsLabel}";
-        ReloadButton.ToolTip = _localization["menu.reload_wordlist"];
+        SettingsButton.ToolTip = settingsLabel;
         StatsButton.ToolTip = _localization["menu.statistics"];
         AboutButton.ToolTip = _localization["menu.about"];
         HistoryButton.ToolTip = _localization["menu.history"];
+        WordCountButton.ToolTip = _localization["menu.wordcount"];
         WordListBrowserButton.ToolTip = _localization["wordlist_browser.tooltip"];
-        DiffButton.ToolTip = _localization["diff.tooltip"];
         FileOpenButton.ToolTip = "打开文件 / 导入单词";
         InputLabel.Text = _localization["input.label"];
         ResultLabel.Text = _localization["result.label"];
         CopyButton.Content = $"📋 {_localization["menu.copy_result"]}";
+        ReplaceConfirmButton.Content = _localization["replace.replace"];
+        ResultReplaceButton.Content = _localization["replace.replace"];
+        ResultReplaceGoButton.Content = _localization["replace.replace"];
+        ResultReplaceFindLabel.Text = _localization["replace.find"] + "：";
+        ResultReplaceToLabel.Text = _localization["replace.to"] + "：";
+        ResultReplaceButton.ToolTip = _localization["replace.replace"];
         SuggestionLabel.Text = $"💡 {_localization["suggestion.title"]}";
 
         if (_wordlist.WordCount > 0)
@@ -713,6 +861,24 @@ public partial class MainWindow : Window
         dialog.ShowDialog();
     }
 
+    // ── 字数统计 ──────────────────────────────────────────
+    private void OnOpenWordCount(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var dialog = new WordCountWindow(InputBox.Text, _localization)
+            {
+                Owner = this,
+            };
+            dialog.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"字数统计加载失败：{ex.Message}", "错误",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
     private void OnOpenWhitelist(object sender, RoutedEventArgs e)
     {
         var dialog = new WhitelistWindow(_wordlist, _localization);
@@ -725,24 +891,20 @@ public partial class MainWindow : Window
         UpdateResult();
     }
 
-    private void OnReloadWordlist(object sender, RoutedEventArgs e)
+    // ── 词库文件自动重载（由 FileSystemWatcher 触发） ──────
+    private void OnWordListChanged()
     {
-        try
+        Dispatcher.Invoke(() =>
         {
-            var count = _wordlist.Reload();
             _suggestionCache.Clear();
             _suggestionEngine = new SuggestionEngine(_wordlist.Words);
-            WordListInfo.Text = string.Format(_localization["status.words"], count);
+            WordListInfo.Text = string.Format(_localization["status.words"], _wordlist.WordCount);
             var path = _wordlist.SourcePath ?? "";
             WordlistPathLink.Inlines.Clear();
             WordlistPathLink.Inlines.Add(new System.Windows.Documents.Run(
                 string.IsNullOrEmpty(path) ? "—" : Path.GetFileName(path)));
             UpdateResult();
-        }
-        catch (Exception ex)
-        {
-            WordListInfo.Text = $"⚠ {_localization["status.load_failed"]}: {ex.Message}";
-        }
+        });
     }
 
     // ── 统计面板 ──────────────────────────────────────────────────
@@ -828,20 +990,10 @@ public partial class MainWindow : Window
         dialog.ShowDialog();
     }
 
-    // ── 词库浏览器 ─────────────────────────────────────────
+    // ── 词库管理（浏览器 + 对比） ─────────────────────────
     private void OnOpenWordListBrowser(object sender, RoutedEventArgs e)
     {
-        var dialog = new WordListBrowserWindow(_wordlist, _localization)
-        {
-            Owner = this,
-        };
-        dialog.ShowDialog();
-    }
-
-    // ── 词库对比 ─────────────────────────────────────────
-    private void OnOpenDiff(object sender, RoutedEventArgs e)
-    {
-        var dialog = new DiffWindow(_wordlist, _localization)
+        var dialog = new WordListManagerWindow(_wordlist, _localization, _settings)
         {
             Owner = this,
         };
@@ -892,6 +1044,7 @@ public partial class MainWindow : Window
         CompoundSection.Visibility = topCompound.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         foreach (var s in topCompound)
             CompoundItems.Children.Add(BuildSuggestionChip(s.Word, "#6B7280"));
+
     }
 
     private Border BuildSuggestionChip(string word, string accentColor)

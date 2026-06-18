@@ -95,5 +95,19 @@
   "diff.done": "Загружен {0}, различия: только слева {1}, только справа {2}, общие {3}",
   "diff.exported": "Отчёт экспортирован",
   "diff.error": "Ошибка операции",
-  "diff.empty_file": "Выбранный файл не содержит действительных слов"
+  "diff.empty_file": "Выбранный файл не содержит действительных слов",
+  "menu.wordcount": "W Word Count",
+  "wordcount.freq": "Word Frequency",
+  "wordcount.length": "Word Length",
+  "wordcount.total_chars": "Total Characters",
+  "wordcount.chars_no_spaces": "Chars (No Spaces)",
+  "wordcount.chinese_chars": "Chinese Characters",
+  "wordcount.english_letters": "English Letters",
+  "wordcount.digit_chars": "Digits",
+  "wordcount.total_words": "Total Words",
+  "wordcount.unique_words": "Unique Words",
+  "wordcount.avg_length": "Avg Length",
+  "wordcount.total_lines": "Total Lines",
+  "wordcount.nonempty_lines": "Non-Empty Lines",
+  "replace.find": "Find"
 }

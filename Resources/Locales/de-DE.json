@@ -95,5 +95,19 @@
   "diff.done": "{0} geladen, Diff: {1} nur links, {2} nur rechts, {3} gemeinsam",
   "diff.exported": "Diff-Bericht exportiert",
   "diff.error": "Vorgang fehlgeschlagen",
-  "diff.empty_file": "Die ausgewählte Datei enthält keine gültigen Wörter"
+  "diff.empty_file": "Die ausgewählte Datei enthält keine gültigen Wörter",
+  "menu.wordcount": "W Word Count",
+  "wordcount.freq": "Word Frequency",
+  "wordcount.length": "Word Length",
+  "wordcount.total_chars": "Total Characters",
+  "wordcount.chars_no_spaces": "Chars (No Spaces)",
+  "wordcount.chinese_chars": "Chinese Characters",
+  "wordcount.english_letters": "English Letters",
+  "wordcount.digit_chars": "Digits",
+  "wordcount.total_words": "Total Words",
+  "wordcount.unique_words": "Unique Words",
+  "wordcount.avg_length": "Avg Length",
+  "wordcount.total_lines": "Total Lines",
+  "wordcount.nonempty_lines": "Non-Empty Lines",
+  "replace.find": "Find"
 }
