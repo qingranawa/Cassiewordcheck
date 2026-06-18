@@ -88,5 +88,22 @@
   "menu.history": "Historique",
   "suggestion.wildcard": "Correspondance générique",
   "suggestion.fuzzy": "Orthographe similaire",
-  "suggestion.compound": "Division composée"
+  "suggestion.compound": "Division composée",
+  "wordlist_browser.empty": "Le dictionnaire est vide",
+  "diff.tooltip": "Comparaison de dictionnaires",
+  "diff.title": "Comparaison de dictionnaires",
+  "diff.load": "Charger un dictionnaire à comparer",
+  "diff.select_file": "Sélectionner un fichier de dictionnaire à comparer",
+  "diff.left": "Gauche seulement",
+  "diff.left_only": "Gauche seulement",
+  "diff.right_only": "Droite seulement",
+  "diff.right_only_count": "Droite seulement",
+  "diff.common": "Commun",
+  "diff.export": "Exporter le rapport de différences",
+  "diff.export_title": "Exporter le rapport de différences",
+  "diff.prompt": "Cliquez sur « Charger un dictionnaire à comparer » pour sélectionner un fichier",
+  "diff.done": "{0} chargé, différences : {1} gauche seulement, {2} droite seulement, {3} communs",
+  "diff.exported": "Rapport de différences exporté",
+  "diff.error": "Échec de l'opération",
+  "diff.empty_file": "Le fichier sélectionné ne contient aucun mot valide"
 }

@@ -4,6 +4,17 @@ using ClosedXML.Excel;
 
 namespace CassieWordCheck.Models;
 
+/// <summary>词库差异对比结果</summary>
+public record WordListDiff(
+    string LeftLabel,
+    string RightLabel,
+    int LeftOnlyCount,
+    int RightOnlyCount,
+    int CommonCount,
+    IReadOnlySet<string> LeftOnly,
+    IReadOnlySet<string> RightOnly
+);
+
 /// <summary>
 /// 词库——用 FrozenSet 做 O(1) 查询，加载后不可变喵~
 /// 支持白名单、多格式导入（TXT/CSV/Excel）喵
@@ -238,5 +249,23 @@ public partial class WordList
                 dist[ch] = dist.GetValueOrDefault(ch) + 1;
         }
         return dist;
+    }
+
+    /// <summary>与另一个词库对比差异，返回新增/移除/共有关信息</summary>
+    public WordListDiff DiffWith(WordList other, string? leftLabel = null, string? rightLabel = null)
+    {
+        var leftOnly = _words.Except(other._words).ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+        var rightOnly = other._words.Except(_words).ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+        var common = _words.Intersect(other._words).ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+
+        return new WordListDiff(
+            leftLabel ?? Path.GetFileName(_sourcePath) ?? "左词库",
+            rightLabel ?? Path.GetFileName(other._sourcePath) ?? "右词库",
+            leftOnly.Count,
+            rightOnly.Count,
+            common.Count,
+            leftOnly,
+            rightOnly
+        );
     }
 }

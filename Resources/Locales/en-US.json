@@ -84,5 +84,22 @@
   "menu.history": "Check History",
   "suggestion.wildcard": "Wildcard Match",
   "suggestion.fuzzy": "Similar Spelling",
-  "suggestion.compound": "Compound Split"
+  "suggestion.compound": "Compound Split",
+  "wordlist_browser.empty": "Word list is empty",
+  "diff.tooltip": "Word List Diff",
+  "diff.title": "Word List Diff",
+  "diff.load": "Load Compare Word List",
+  "diff.select_file": "Select word list file to compare",
+  "diff.left": "Left Only",
+  "diff.left_only": "Left Only",
+  "diff.right_only": "Right Only",
+  "diff.right_only_count": "Right Only",
+  "diff.common": "Common",
+  "diff.export": "Export Diff Report",
+  "diff.export_title": "Export Word List Diff Report",
+  "diff.prompt": "Click \"Load Compare Word List\" to select a word list file",
+  "diff.done": "Loaded {0}, diff: {1} left-only, {2} right-only, {3} common",
+  "diff.exported": "Diff report exported",
+  "diff.error": "Operation failed",
+  "diff.empty_file": "The selected file contains no valid words"
 }

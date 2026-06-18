@@ -79,5 +79,22 @@
   "menu.history": "검사 기록",
   "suggestion.wildcard": "와일드카드 일치",
   "suggestion.fuzzy": "유사 철자",
-  "suggestion.compound": "복합어 분할"
+  "suggestion.compound": "복합어 분할",
+  "wordlist_browser.empty": "단어 목록이 비어 있습니다",
+  "diff.tooltip": "단어 목록 비교",
+  "diff.title": "단어 목록 비교",
+  "diff.load": "비교할 단어 목록 불러오기",
+  "diff.select_file": "비교할 단어 목록 파일 선택",
+  "diff.left": "왼쪽만",
+  "diff.left_only": "왼쪽에만 존재",
+  "diff.right_only": "오른쪽에만 존재",
+  "diff.right_only_count": "오른쪽만",
+  "diff.common": "공통",
+  "diff.export": "차이 보고서 내보내기",
+  "diff.export_title": "단어 목록 차이 보고서 내보내기",
+  "diff.prompt": "「비교할 단어 목록 불러오기」를 클릭하여 파일 선택",
+  "diff.done": "{0} 로드 완료, 차이: 왼쪽만 {1}개, 오른쪽만 {2}개, 공통 {3}개",
+  "diff.exported": "차이 보고서 내보내기 완료",
+  "diff.error": "작업 실패",
+  "diff.empty_file": "선택한 파일에 유효한 단어가 없습니다"
 }

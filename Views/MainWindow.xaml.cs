@@ -668,6 +668,7 @@ public partial class MainWindow : Window
         AboutButton.ToolTip = _localization["menu.about"];
         HistoryButton.ToolTip = _localization["menu.history"];
         WordListBrowserButton.ToolTip = _localization["wordlist_browser.tooltip"];
+        DiffButton.ToolTip = _localization["diff.tooltip"];
         FileOpenButton.ToolTip = "打开文件 / 导入单词";
         InputLabel.Text = _localization["input.label"];
         ResultLabel.Text = _localization["result.label"];
@@ -831,6 +832,16 @@ public partial class MainWindow : Window
     private void OnOpenWordListBrowser(object sender, RoutedEventArgs e)
     {
         var dialog = new WordListBrowserWindow(_wordlist, _localization)
+        {
+            Owner = this,
+        };
+        dialog.ShowDialog();
+    }
+
+    // ── 词库对比 ─────────────────────────────────────────
+    private void OnOpenDiff(object sender, RoutedEventArgs e)
+    {
+        var dialog = new DiffWindow(_wordlist, _localization)
         {
             Owner = this,
         };

@@ -80,5 +80,22 @@
   "menu.history": "チェック履歴",
   "suggestion.wildcard": "ワイルドカード一致",
   "suggestion.fuzzy": "類似スペル",
-  "suggestion.compound": "複合語分割"
+  "suggestion.compound": "複合語分割",
+  "wordlist_browser.empty": "単語リストが空です",
+  "diff.tooltip": "単語リスト差分",
+  "diff.title": "単語リスト差分",
+  "diff.load": "比較する単語リストを読み込む",
+  "diff.select_file": "比較する単語リストファイルを選択",
+  "diff.left": "左のみ",
+  "diff.left_only": "左のみ存在",
+  "diff.right_only": "右のみ存在",
+  "diff.right_only_count": "右のみ",
+  "diff.common": "共通",
+  "diff.export": "差分レポートをエクスポート",
+  "diff.export_title": "単語リスト差分レポートのエクスポート",
+  "diff.prompt": "「比較する単語リストを読み込む」をクリックしてファイルを選択",
+  "diff.done": "{0} を読み込みました、差分: 左のみ {1} 語、右のみ {2} 語、共通 {3} 語",
+  "diff.exported": "差分レポートをエクスポートしました",
+  "diff.error": "操作に失敗しました",
+  "diff.empty_file": "選択したファイルに有効な単語が含まれていません"
 }

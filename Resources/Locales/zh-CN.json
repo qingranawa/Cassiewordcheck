@@ -84,5 +84,22 @@
   "menu.history": "检查历史",
   "suggestion.wildcard": "通配匹配",
   "suggestion.fuzzy": "相似拼写",
-  "suggestion.compound": "拆分建议"
+  "suggestion.compound": "拆分建议",
+  "wordlist_browser.empty": "词库为空",
+  "diff.tooltip": "词库对比",
+  "diff.title": "词库对比",
+  "diff.load": "加载对比词库",
+  "diff.select_file": "选择要对比的词库文件",
+  "diff.left": "左侧独有",
+  "diff.left_only": "仅左侧存在",
+  "diff.right_only": "仅右侧存在",
+  "diff.right_only_count": "右侧独有",
+  "diff.common": "共有",
+  "diff.export": "导出差异报告",
+  "diff.export_title": "导出词库差异报告",
+  "diff.prompt": "请点击「加载对比词库」选择要对比的词库文件",
+  "diff.done": "已加载 {0}，差异：左侧独有 {1} 词，右侧独有 {2} 词，共有 {3} 词",
+  "diff.exported": "差异报告已导出",
+  "diff.error": "操作失败",
+  "diff.empty_file": "选择的文件不包含有效单词"
 }

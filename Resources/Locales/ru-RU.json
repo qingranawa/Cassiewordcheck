@@ -78,5 +78,22 @@
   "menu.history": "История",
   "suggestion.wildcard": "Подстановочный знак",
   "suggestion.fuzzy": "Похожее написание",
-  "suggestion.compound": "Разделение составных"
+  "suggestion.compound": "Разделение составных",
+  "wordlist_browser.empty": "Словарь пуст",
+  "diff.tooltip": "Сравнение словарей",
+  "diff.title": "Сравнение словарей",
+  "diff.load": "Загрузить словарь для сравнения",
+  "diff.select_file": "Выберите файл словаря для сравнения",
+  "diff.left": "Только слева",
+  "diff.left_only": "Только слева",
+  "diff.right_only": "Только справа",
+  "diff.right_only_count": "Только справа",
+  "diff.common": "Общие",
+  "diff.export": "Экспорт отчёта",
+  "diff.export_title": "Экспорт отчёта о различиях",
+  "diff.prompt": "Нажмите «Загрузить словарь для сравнения», чтобы выбрать файл",
+  "diff.done": "Загружен {0}, различия: только слева {1}, только справа {2}, общие {3}",
+  "diff.exported": "Отчёт экспортирован",
+  "diff.error": "Ошибка операции",
+  "diff.empty_file": "Выбранный файл не содержит действительных слов"
 }

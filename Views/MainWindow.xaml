@@ -48,6 +48,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.Column="0"
@@ -149,6 +150,18 @@
                             VerticalAlignment="Center"
                             ToolTip="词库浏览器"
                             Click="OnOpenWordListBrowser" />
+
+                    <Button Grid.Column="10"
+                            x:Name="DiffButton"
+                            Style="{StaticResource ModernButton}"
+                            Content="⇄"
+                            Padding="8,6"
+                            Width="32"
+                            FontSize="15"
+                            Margin="4,0,0,0"
+                            VerticalAlignment="Center"
+                            ToolTip="词库对比"
+                            Click="OnOpenDiff" />
                 </Grid>
 
                 <!-- Separator + status line -->

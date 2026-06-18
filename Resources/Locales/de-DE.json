@@ -78,5 +78,22 @@
   "menu.history": "Verlauf",
   "suggestion.wildcard": "Platzhalter-Treffer",
   "suggestion.fuzzy": "Ähnliche Schreibweise",
-  "suggestion.compound": "Zusammensetzung"
+  "suggestion.compound": "Zusammensetzung",
+  "wordlist_browser.empty": "Wortliste ist leer",
+  "diff.tooltip": "Wortlisten-Vergleich",
+  "diff.title": "Wortlisten-Vergleich",
+  "diff.load": "Vergleichs-Wortliste laden",
+  "diff.select_file": "Wortlisten-Datei zum Vergleichen auswählen",
+  "diff.left": "Nur links",
+  "diff.left_only": "Nur links vorhanden",
+  "diff.right_only": "Nur rechts vorhanden",
+  "diff.right_only_count": "Nur rechts",
+  "diff.common": "Gemeinsam",
+  "diff.export": "Diff-Bericht exportieren",
+  "diff.export_title": "Wortlisten-Diff-Bericht exportieren",
+  "diff.prompt": "Klicken Sie auf „Vergleichs-Wortliste laden\", um eine Datei auszuwählen",
+  "diff.done": "{0} geladen, Diff: {1} nur links, {2} nur rechts, {3} gemeinsam",
+  "diff.exported": "Diff-Bericht exportiert",
+  "diff.error": "Vorgang fehlgeschlagen",
+  "diff.empty_file": "Die ausgewählte Datei enthält keine gültigen Wörter"
 }
