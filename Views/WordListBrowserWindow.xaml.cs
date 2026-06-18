@@ -30,7 +30,10 @@ public partial class WordListBrowserWindow : Window
 
     private void OnWindowLoaded(object sender, RoutedEventArgs e)
     {
-        // 加载所有单词
+        // 本地化标题和标签
+        Title = _localization["wordlist_browser.title"];
+        LengthDistTitle.Text = _localization["wordlist_browser.length_dist"];
+        FirstLetterDistTitle.Text = _localization["wordlist_browser.first_letter_dist"];
         _allWords = [.. _wordlist.Words];
         ApplyFilterAndSort();
         RenderStatistics();
@@ -106,8 +109,8 @@ public partial class WordListBrowserWindow : Window
         EmptyListLabel.Visibility = sorted.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
         // 状态栏
-        TotalWordsLabel.Text = $"总词数：{_allWords.Count}";
-        FilteredWordsLabel.Text = $"匹配：{sorted.Count}";
+        TotalWordsLabel.Text = string.Format(_localization["wordlist_browser.total"], _allWords.Count);
+        FilteredWordsLabel.Text = string.Format(_localization["wordlist_browser.filtered"], sorted.Count);
     }
 
     // ── 统计面板渲染 ─────────────────────────────────────
@@ -125,7 +128,7 @@ public partial class WordListBrowserWindow : Window
         {
             LengthDistPanel.Children.Add(new TextBlock
             {
-                Text = "无数据",
+                Text = _localization["stats.no_data"],
                 Foreground = LabelBrush,
                 FontSize = 11,
             });
@@ -200,7 +203,7 @@ public partial class WordListBrowserWindow : Window
         {
             FirstLetterDistPanel.Children.Add(new TextBlock
             {
-                Text = "无数据",
+                Text = _localization["stats.no_data"],
                 Foreground = LabelBrush,
                 FontSize = 11,
             });

@@ -83,5 +83,10 @@
   "detail.frequency": "ปรากฏ {0} ครั้ง",
   "detail.suggestions": "คำแนะนำการสะกด",
   "wordlist_browser.tooltip": "เบราว์เซอร์รายการคำศัพท์",
+  "wordlist_browser.title": "เบราว์เซอร์รายการคำศัพท์",
+  "wordlist_browser.total": "ทั้งหมด: {0}",
+  "wordlist_browser.filtered": "ตรงกัน: {0}",
+  "wordlist_browser.length_dist": "การกระจายความยาวคำ",
+  "wordlist_browser.first_letter_dist": "การกระจายตัวอักษรแรก",
   "app.single_instance": "แอปพลิเคชันกำลังทำงานอยู่แล้ว"
 }

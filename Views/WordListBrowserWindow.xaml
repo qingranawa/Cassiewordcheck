@@ -167,7 +167,7 @@
                         <!-- 词长分布标题 -->
                         <TextBlock Grid.Row="0"
                                    x:Name="LengthDistTitle"
-                                   Text="词长分布"
+                                   Text=""
                                    Style="{StaticResource SectionLabel}"
                                    Margin="0,0,0,6" />
 
@@ -188,7 +188,7 @@
                         <!-- 首字母分布标题 -->
                         <TextBlock Grid.Row="3"
                                    x:Name="FirstLetterDistTitle"
-                                   Text="首字母分布"
+                                   Text=""
                                    Style="{StaticResource SectionLabel}"
                                    Margin="0,0,0,6" />
 
