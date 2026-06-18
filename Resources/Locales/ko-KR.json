@@ -64,5 +64,15 @@
   "update.current": "최신 버전입니다",
   "update.download": "다운로드",
   "update.error": "확인 실패",
-  "update.new_version": "v{0} 사용 가능 (현재: v{1})"
+  "update.new_version": "v{0} 사용 가능 (현재: v{1})",
+  "mode.inline": "인라인 모드",
+  "mode.list": "목록 모드",
+  "mode.compare": "비교 모드",
+  "detail.frequency": "출연 {0}회",
+  "detail.suggestions": "철자 제안",
+  "wordlist_browser.tooltip": "단어 목록 브라우저",
+  "menu.history": "검사 기록",
+  "suggestion.wildcard": "와일드카드 일치",
+  "suggestion.fuzzy": "유사 철자",
+  "suggestion.compound": "복합어 분할"
 }

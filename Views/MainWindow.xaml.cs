@@ -1,3 +1,4 @@
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -13,6 +14,7 @@ public partial class MainWindow : Window
     private readonly Settings _settings;
     private readonly LocalizationService _localization;
     private readonly Dictionary<string, string> _suggestionCache = new(StringComparer.OrdinalIgnoreCase);
+    private SuggestionEngine _suggestionEngine = null!;
     private readonly Stack<string> _undoStack = new();
     private readonly Stack<string> _redoStack = new();
     private readonly HistoryStore _historyStore = new();
@@ -26,6 +28,12 @@ public partial class MainWindow : Window
     private string _snapshotResult = "";
     private int _snapshotAvailable, _snapshotUnavailable, _snapshotIgnored;
     private double _snapshotCoverage;
+    // 结果面板排版模式（inline / list / compare）
+    private string _currentMode = "inline";
+    // 当前文本每个不可用词的出现频率（由 UpdateResult 计算）
+    private Dictionary<string, int> _currentWordFreq = new(StringComparer.OrdinalIgnoreCase);
+    // 弹窗防抖计时器（鼠标快速扫过单词时不反复闪烁）
+    private readonly DispatcherTimer _popupDebounceTimer = new();
 
     public MainWindow()
     {
@@ -53,6 +61,7 @@ public partial class MainWindow : Window
 
         _suggestionLabelOriginal = SuggestionLabel.Text;
         LoadWordListAsync();
+        _suggestionEngine = new SuggestionEngine(_wordlist.Words);
         UpdateUILanguage();
 
         // 每 3 分钟自动保存历史快照
@@ -63,6 +72,22 @@ public partial class MainWindow : Window
         // 输入防抖（80ms 内连续输入只触发一次结果更新）
         _debounceTimer.Interval = TimeSpan.FromMilliseconds(80);
         _debounceTimer.Tick += OnDebounceTick;
+
+        // 加载结果面板排版模式
+        _currentMode = _settings.ResultMode;
+        PopulateModeCombo();
+
+        // 不可用 Run 的 MouseEnter/MouseLeave 路由事件 —— 触发单词详情弹窗
+        ResultBox.AddHandler(Run.MouseEnterEvent, new MouseEventHandler(OnRunMouseEnter));
+        ResultBox.AddHandler(Run.MouseLeaveEvent, new MouseEventHandler(OnRunMouseLeave));
+
+        // 弹窗防抖：鼠标离开单词后延迟 100ms 关闭
+        _popupDebounceTimer.Interval = TimeSpan.FromMilliseconds(100);
+        _popupDebounceTimer.Tick += (_, _) =>
+        {
+            _popupDebounceTimer.Stop();
+            WordDetailPopup.IsOpen = false;
+        };
     }
 
     // ── 入场动画（错峰播放，减少同时并发）─────────────────────────
@@ -180,9 +205,11 @@ public partial class MainWindow : Window
         CharCountLabel.Text = string.Format(_localization["stats.chars"], text.Length);
 
         var results = _checker.CheckText(text);
+        _currentWordFreq = _checker.GetWordFrequency(results);
         var stats = _checker.GetStatistics(results, text);
 
         ResultBox.Document = DocumentBuilder.BuildResultDocument(results, ResultBox.ActualWidth, _settings.FontSize);
+        BuildModeViews(results);  // 同步更新列表和两栏视图
 
         var available = (int)stats["available"];
         var unavailable = (int)stats["unavailable"];
@@ -246,14 +273,12 @@ public partial class MainWindow : Window
                 Animate(SuggestionsPanel, UIElement.OpacityProperty, 0, 1, 250, new QuadraticEase());
                 Animate(st, TranslateTransform.YProperty, 20, 0, 300, new QuadraticEase());
 
-                var heightAnim = new DoubleAnimation(250, new Duration(TimeSpan.FromMilliseconds(350)))
+                var heightAnim = new DoubleAnimation(350, new Duration(TimeSpan.FromMilliseconds(350)))
                 { EasingFunction = new QuadraticEase() };
                 SuggestionsPanel.BeginAnimation(FrameworkElement.MaxHeightProperty, heightAnim);
             }
 
-            SuggestionsList.ItemsSource = unavailableWords
-                .Select(w => new { Original = w, SuggestionText = FormatSuggestions(w) })
-                .ToList();
+            BuildSuggestionPanel(unavailableWords);
         }
         else if (SuggestionsPanel.Visibility == Visibility.Visible)
         {
@@ -375,7 +400,157 @@ public partial class MainWindow : Window
         return result;
     }
 
-    // ── 文件操作：打开文本 / 导入单词 ────────────────────────────
+    // ── 结果面板排版模式切换 ──────────────────────────
+    private void PopulateModeCombo()
+    {
+        ModeCombo.Items.Clear();
+        // 使用匿名类型 + SelectedValuePath 实现 ComboBox 值绑定
+        var modes = new[]
+        {
+            new { Text = _localization["mode.inline"], Value = "inline" },
+            new { Text = _localization["mode.list"], Value = "list" },
+            new { Text = _localization["mode.compare"], Value = "compare" },
+        };
+        foreach (var m in modes)
+            ModeCombo.Items.Add(m);
+        ModeCombo.SelectedValuePath = "Value";
+        ModeCombo.DisplayMemberPath = "Text";
+        ModeCombo.SelectedValue = _currentMode;
+    }
+
+    private void OnModeChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ModeCombo.SelectedValue is string mode && mode != _currentMode)
+        {
+            _currentMode = mode;
+            _settings.ResultMode = mode;
+            _settings.Save();
+            SwitchModeView(mode);
+        }
+    }
+
+    private void SwitchModeView(string mode)
+    {
+        // 淡出当前可见的视图
+        var activeViews = new FrameworkElement[] { ResultBox, ResultListView, ResultCompareGrid };
+        foreach (var v in activeViews)
+        {
+            if (v.Visibility == Visibility.Visible)
+                Animate(v, UIElement.OpacityProperty, 1, 0, 150, null);
+        }
+
+        // 160ms 后切换可见性并淡入
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(160) };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            ResultBox.Visibility = mode == "inline" ? Visibility.Visible : Visibility.Collapsed;
+            ResultListView.Visibility = mode == "list" ? Visibility.Visible : Visibility.Collapsed;
+            ResultCompareGrid.Visibility = mode == "compare" ? Visibility.Visible : Visibility.Collapsed;
+
+            foreach (var v in activeViews)
+            {
+                if (v.Visibility == Visibility.Visible)
+                {
+                    v.Opacity = 0;
+                    Animate(v, UIElement.OpacityProperty, 0, 1, 200, null);
+                }
+            }
+        };
+        timer.Start();
+    }
+
+    private void BuildModeViews(List<CheckResult> results)
+    {
+        // 列表模式数据
+        var colorSuccess = new SolidColorBrush(Color.FromRgb(0x10, 0xB9, 0x81));
+        var colorError = new SolidColorBrush(Color.FromRgb(0xEF, 0x44, 0x44));
+        var colorIgnored = new SolidColorBrush(Color.FromRgb(0x6B, 0x72, 0x80));
+        var bgSuccess = new SolidColorBrush(Color.FromRgb(0x0A, 0x2E, 0x1A));
+        var bgError = new SolidColorBrush(Color.FromRgb(0x2D, 0x1B, 0x1B));
+        var bgIgnored = new SolidColorBrush(Color.FromRgb(0x1A, 0x1A, 0x24));
+
+        ResultListView.ItemsSource = results.Select(r => new
+        {
+            Text = r.Text,
+            StatusColor = r.Status switch
+            {
+                CheckStatus.Available => colorSuccess,
+                CheckStatus.Unavailable => colorError,
+                _ => colorIgnored,
+            },
+            StatusLabel = r.Status switch
+            {
+                CheckStatus.Available => "可用",
+                CheckStatus.Unavailable => "不可用",
+                CheckStatus.Ignored => "已忽略",
+                _ => "",
+            },
+            StatusBg = r.Status switch
+            {
+                CheckStatus.Available => bgSuccess,
+                CheckStatus.Unavailable => bgError,
+                _ => bgIgnored,
+            },
+        }).ToList();
+
+        // 两栏模式数据
+        var available = results
+            .Where(r => r.Status == CheckStatus.Available)
+            .Select(r => r.Text)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(w => w)
+            .ToList();
+        var unavailable = results
+            .Where(r => r.Status == CheckStatus.Unavailable)
+            .Select(r => r.Text)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(w => w)
+            .ToList();
+
+        AvailableList.ItemsSource = available;
+        UnavailableList.ItemsSource = unavailable;
+    }
+
+    // ── 单词详情弹窗 ──────────────────────────────────
+    private void OnRunMouseEnter(object sender, MouseEventArgs e)
+    {
+        // 停止防抖（鼠标又回来了）
+        _popupDebounceTimer.Stop();
+
+        if (e.OriginalSource is Run run && run.Tag is CheckResult cr && cr.Status == CheckStatus.Unavailable)
+        {
+            ShowWordDetailPopup(cr.Text);
+        }
+    }
+
+    private void OnRunMouseLeave(object sender, MouseEventArgs e)
+    {
+        // 启动 100ms 防抖，避免单词间快速移动时闪烁
+        _popupDebounceTimer.Start();
+    }
+
+    private void ShowWordDetailPopup(string word)
+    {
+        PopupWordText.Text = word;
+
+        // 频率统计
+        var freq = _currentWordFreq.GetValueOrDefault(word, 0);
+        PopupFreqText.Text = string.Format(_localization["detail.frequency"], freq);
+
+        // 拼写建议
+        PopupSuggestionTitle.Text = _localization["detail.suggestions"];
+        var suggestions = LevenshteinHelper.FindClosest(word, _wordlist.Words, 3);
+        PopupSuggestionList.ItemsSource = suggestions.Select(s => s.word).ToList();
+
+        WordDetailPopup.IsOpen = true;
+    }
+
+    private void HideWordDetailPopup()
+    {
+        WordDetailPopup.IsOpen = false;
+    }
+
     private async void OnFileOpenOrImport(object sender, RoutedEventArgs e)
     {
         var dialog = new Microsoft.Win32.OpenFileDialog
@@ -414,6 +589,7 @@ public partial class MainWindow : Window
             if (totalAdded > 0)
             {
                 _suggestionCache.Clear();
+                _suggestionEngine = new SuggestionEngine(_wordlist.Words);
                 WordListInfo.Text = string.Format(_localization["status.words"], _wordlist.WordCount);
                 UpdateResult();
             }
@@ -490,6 +666,8 @@ public partial class MainWindow : Window
         ReloadButton.ToolTip = _localization["menu.reload_wordlist"];
         StatsButton.ToolTip = _localization["menu.statistics"];
         AboutButton.ToolTip = _localization["menu.about"];
+        HistoryButton.ToolTip = _localization["menu.history"];
+        WordListBrowserButton.ToolTip = _localization["wordlist_browser.tooltip"];
         FileOpenButton.ToolTip = "打开文件 / 导入单词";
         InputLabel.Text = _localization["input.label"];
         ResultLabel.Text = _localization["result.label"];
@@ -508,6 +686,8 @@ public partial class MainWindow : Window
             WordListInfo.Text = _localization["status.ready"];
 
         UpdateResult();
+        // 刷新模式 ComboBox 语言
+        PopulateModeCombo();
     }
 
     // ── 打开设置 ──────────────────────────────────────────────────
@@ -550,6 +730,7 @@ public partial class MainWindow : Window
         {
             var count = _wordlist.Reload();
             _suggestionCache.Clear();
+            _suggestionEngine = new SuggestionEngine(_wordlist.Words);
             WordListInfo.Text = string.Format(_localization["status.words"], count);
             var path = _wordlist.SourcePath ?? "";
             WordlistPathLink.Inlines.Clear();
@@ -644,6 +825,136 @@ public partial class MainWindow : Window
             Owner = this,
         };
         dialog.ShowDialog();
+    }
+
+    // ── 词库浏览器 ─────────────────────────────────────────
+    private void OnOpenWordListBrowser(object sender, RoutedEventArgs e)
+    {
+        var dialog = new WordListBrowserWindow(_wordlist, _localization)
+        {
+            Owner = this,
+        };
+        dialog.ShowDialog();
+    }
+
+    // ── 建议面板 ──────────────────────────────────────────
+    private void BuildSuggestionPanel(List<string> unavailableWords)
+    {
+        // 清空所有分类容器
+        WildcardItems.Children.Clear();
+        FuzzyItems.Children.Clear();
+        CompoundItems.Children.Clear();
+
+        // 对每个不可用词获取建议，聚合到分类池
+        var allWildcard = new List<SuggestionResult>();
+        var allFuzzy = new List<SuggestionResult>();
+        var allCompound = new List<SuggestionResult>();
+
+        foreach (var word in unavailableWords)
+        {
+            var suggestions = _suggestionEngine.GetSuggestions(word, 14);
+
+            foreach (var s in suggestions.Where(s => s.Source == "wildcard" && !allWildcard.Any(ex => string.Equals(ex.Word, s.Word, StringComparison.OrdinalIgnoreCase))))
+                allWildcard.Add(s);
+            foreach (var s in suggestions.Where(s => s.Source == "fuzzy" && !allFuzzy.Any(ex => string.Equals(ex.Word, s.Word, StringComparison.OrdinalIgnoreCase))))
+                allFuzzy.Add(s);
+            foreach (var s in suggestions.Where(s => s.Source == "compound" && !allCompound.Any(ex => string.Equals(ex.Word, s.Word, StringComparison.OrdinalIgnoreCase))))
+                allCompound.Add(s);
+        }
+
+        // 限制每类数量
+        var topWildcard = allWildcard.OrderByDescending(r => r.Confidence).Take(6).ToList();
+        var topFuzzy = allFuzzy.OrderByDescending(r => r.Confidence).Take(5).ToList();
+        var topCompound = allCompound.OrderByDescending(r => r.Confidence).Take(3).ToList();
+
+        // 渲染通配匹配区
+        WildcardSection.Visibility = topWildcard.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        foreach (var s in topWildcard)
+            WildcardItems.Children.Add(BuildSuggestionChip(s.Word, "#8B7CF0"));
+
+        // 渲染拼写修正区
+        FuzzySection.Visibility = topFuzzy.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        foreach (var s in topFuzzy)
+            FuzzyItems.Children.Add(BuildSuggestionChip(s.Word, "#F59E0B"));
+
+        // 渲染拆分建议区
+        CompoundSection.Visibility = topCompound.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        foreach (var s in topCompound)
+            CompoundItems.Children.Add(BuildSuggestionChip(s.Word, "#6B7280"));
+    }
+
+    private Border BuildSuggestionChip(string word, string accentColor)
+    {
+        var color = (Color)ColorConverter.ConvertFromString(accentColor);
+        var brush = new SolidColorBrush(color);
+
+        var chip = new Border
+        {
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10, 6, 10, 6),
+            Margin = new Thickness(0, 0, 8, 6),
+            Background = new SolidColorBrush(Color.FromRgb(0x1A, 0x1A, 0x2E)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x35)),
+            BorderThickness = new Thickness(1),
+            Cursor = Cursors.Hand,
+            Tag = word,
+        };
+
+        var textBlock = new TextBlock
+        {
+            Text = word,
+            FontSize = 12,
+            FontFamily = new FontFamily("Segoe UI, Consolas"),
+            Foreground = brush,
+        };
+        chip.Child = textBlock;
+
+        chip.MouseLeftButtonUp += (_, _) =>
+        {
+            var currentText = InputBox.Text;
+            var caretPos = InputBox.CaretIndex;
+
+            if (word.Contains(" + "))
+            {
+                // 复合词拆分建议：替换为多个词
+                var parts = word.Split(" + ");
+                var replacement = string.Join(" ", parts);
+                var (start, len) = FindWordAtPosition(currentText, caretPos);
+                if (start >= 0)
+                {
+                    InputBox.Text = currentText[..start] + replacement + currentText[(start + len)..];
+                    InputBox.CaretIndex = start + replacement.Length;
+                }
+            }
+            else
+            {
+                var (start, len) = FindWordAtPosition(currentText, caretPos);
+                if (start >= 0)
+                {
+                    InputBox.Text = currentText[..start] + word + currentText[(start + len)..];
+                    InputBox.CaretIndex = start + word.Length;
+                }
+            }
+        };
+
+        return chip;
+    }
+
+    /// <summary>查找光标位置所在的单词的起止索引</summary>
+    private static (int start, int length) FindWordAtPosition(string text, int caretIndex)
+    {
+        if (string.IsNullOrEmpty(text) || caretIndex < 0) return (-1, 0);
+
+        // 从光标位置向左找到单词开头
+        int start = caretIndex;
+        while (start > 0 && !char.IsWhiteSpace(text[start - 1])) start--;
+
+        // 从光标位置向右找到单词结尾
+        int end = caretIndex;
+        while (end < text.Length && !char.IsWhiteSpace(text[end])) end++;
+
+        if (start == end) return (-1, 0);
+        return (start, end - start);
     }
 
     /// <summary>每隔 3 分钟自动将当前快照写入历史记录</summary>

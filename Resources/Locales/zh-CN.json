@@ -69,5 +69,15 @@
   "update.current": "已是最新版本",
   "update.download": "前往下载",
   "update.error": "检查更新失败",
-  "update.new_version": "v{0} 已发布（当前：v{1}）"
+  "update.new_version": "v{0} 已发布（当前：v{1}）",
+  "mode.inline": "内嵌模式",
+  "mode.list": "列表模式",
+  "mode.compare": "两栏对比",
+  "detail.frequency": "出现 {0} 次",
+  "detail.suggestions": "拼写建议",
+  "wordlist_browser.tooltip": "词库浏览器",
+  "menu.history": "检查历史",
+  "suggestion.wildcard": "通配匹配",
+  "suggestion.fuzzy": "相似拼写",
+  "suggestion.compound": "拆分建议"
 }

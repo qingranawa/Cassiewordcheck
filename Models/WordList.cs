@@ -212,4 +212,31 @@ public partial class WordList
                 words.Add(p.ToLowerInvariant());
         }
     }
+
+    /// <summary>获取词长分布：词长 -> 单词数量</summary>
+    public Dictionary<int, int> GetWordLengthDistribution()
+    {
+        var dist = new Dictionary<int, int>();
+        foreach (var word in _words)
+        {
+            var len = word.Length;
+            dist[len] = dist.GetValueOrDefault(len) + 1;
+        }
+        return dist;
+    }
+
+    /// <summary>获取首字母分布：首字母 -> 单词数量（不区分大小写，统一小写）</summary>
+    public Dictionary<char, int> GetFirstLetterDistribution()
+    {
+        var dist = new Dictionary<char, int>();
+        foreach (var word in _words)
+        {
+            if (word.Length == 0) continue;
+            var ch = char.ToLowerInvariant(word[0]);
+            // 只统计字母 a-z
+            if (ch is >= 'a' and <= 'z')
+                dist[ch] = dist.GetValueOrDefault(ch) + 1;
+        }
+        return dist;
+    }
 }

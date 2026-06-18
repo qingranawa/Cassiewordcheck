@@ -73,5 +73,15 @@
   "app.single_instance": "L'application est déjà en cours d'exécution.",
   "menu.statistics": "Statistiques",
   "menu.import_words": "Importer des mots",
-  "menu.about": "À propos"
+  "menu.about": "À propos",
+  "mode.inline": "Mode Inline",
+  "mode.list": "Mode Liste",
+  "mode.compare": "Comparer",
+  "detail.frequency": "Apparaît {0} fois",
+  "detail.suggestions": "Suggestions",
+  "wordlist_browser.tooltip": "Navigateur de dictionnaire",
+  "menu.history": "Historique",
+  "suggestion.wildcard": "Correspondance générique",
+  "suggestion.fuzzy": "Orthographe similaire",
+  "suggestion.compound": "Division composée"
 }

@@ -46,6 +46,8 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.Column="0"
@@ -104,7 +106,15 @@
                             ToolTip="关于"
                             Click="OnOpenAbout" />
 
-                    <Button Grid.Column="6"
+                    <ComboBox Grid.Column="6"
+                              x:Name="ModeCombo"
+                              Style="{StaticResource ModernComboBox}"
+                              Width="110"
+                              Margin="4,0,8,0"
+                              VerticalAlignment="Center"
+                              SelectionChanged="OnModeChanged" />
+
+                    <Button Grid.Column="7"
                             x:Name="StatsButton"
                             Style="{StaticResource ModernButton}"
                             Content="📊"
@@ -116,7 +126,7 @@
                             ToolTip="统计面板"
                             Click="OnOpenStatistics" />
 
-                    <Button Grid.Column="7"
+                    <Button Grid.Column="8"
                             x:Name="HistoryButton"
                             Style="{StaticResource ModernButton}"
                             Content="🕐"
@@ -127,6 +137,18 @@
                             VerticalAlignment="Center"
                             ToolTip="检查历史"
                             Click="OnToggleHistory" />
+
+                    <Button Grid.Column="9"
+                            x:Name="WordListBrowserButton"
+                            Style="{StaticResource ModernButton}"
+                            Content="📖"
+                            Padding="8,6"
+                            Width="32"
+                            FontSize="15"
+                            Margin="4,0,0,0"
+                            VerticalAlignment="Center"
+                            ToolTip="词库浏览器"
+                            Click="OnOpenWordListBrowser" />
                 </Grid>
 
                 <!-- Separator + status line -->
@@ -326,6 +348,189 @@
                                  FontSize="14"
                                  FontFamily="{StaticResource MonoFont}"
                                  IsReadOnly="True" />
+
+                    <!-- 列表模式（每个单词一行） -->
+                    <ListView x:Name="ResultListView"
+                              Visibility="Collapsed"
+                              Grid.Row="1"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              Padding="16,12"
+                              FontSize="14"
+                              FontFamily="{StaticResource MonoFont}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="6" Padding="8,4" Margin="0,0,0,2"
+                                        Background="{StaticResource SurfaceBrush}"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Width="8" Height="8"
+                                                 Fill="{Binding StatusColor}"
+                                                 VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Text}"
+                                                   FontSize="14"
+                                                   FontFamily="{StaticResource MonoFont}"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                   Margin="10,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                        <Border Grid.Column="2"
+                                                CornerRadius="4" Padding="6,2"
+                                                Background="{Binding StatusBg}"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding StatusLabel}"
+                                                       FontSize="11"
+                                                       Foreground="{Binding StatusColor}" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <!-- 两栏对比模式 -->
+                    <Grid x:Name="ResultCompareGrid"
+                          Visibility="Collapsed"
+                          Grid.Row="1"
+                          Margin="16,12,16,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 左栏：可用词 -->
+                        <Border Grid.Column="0" CornerRadius="8" Background="#0A2E1A"
+                                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                Padding="12,8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="可用词" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource SuccessBrush}"
+                                           Margin="0,0,0,8" />
+                                <ListBox x:Name="AvailableList" Grid.Row="1"
+                                         Background="Transparent" BorderThickness="0"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="13"
+                                                       FontFamily="{StaticResource MonoFont}"
+                                                       Foreground="{StaticResource SuccessBrush}"
+                                                       Padding="4,2" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+
+                        <!-- 分隔线 -->
+                        <Border Grid.Column="1" Width="1"
+                                Background="{StaticResource BorderBrush}"
+                                Margin="12,0" />
+
+                        <!-- 右栏：不可用词 -->
+                        <Border Grid.Column="2" CornerRadius="8" Background="#2D1B1B"
+                                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                Padding="12,8">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="不可用词" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource ErrorBrush}"
+                                           Margin="0,0,0,8" />
+                                <ListBox x:Name="UnavailableList" Grid.Row="1"
+                                         Background="Transparent" BorderThickness="0"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="13"
+                                                       FontFamily="{StaticResource MonoFont}"
+                                                       Foreground="{StaticResource ErrorBrush}"
+                                                       Padding="4,2" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- 单词详情浮窗（鼠标悬停不可用词时弹出） -->
+                    <Popup x:Name="WordDetailPopup"
+                           Placement="Mouse"
+                           AllowsTransparency="True"
+                           PopupAnimation="Fade"
+                           StaysOpen="False"
+                           IsOpen="False">
+                        <Border CornerRadius="12"
+                                Background="{StaticResource SurfaceBrush}"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="1"
+                                Padding="16,12"
+                                MaxWidth="320">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="14" Opacity="0.4" ShadowDepth="4" Direction="270" Color="#000000" />
+                            </Border.Effect>
+                            <StackPanel>
+                                <!-- 单词标题 -->
+                                <TextBlock x:Name="PopupWordText"
+                                           FontSize="15" FontWeight="SemiBold"
+                                           Foreground="{StaticResource ErrorBrush}"
+                                           FontFamily="{StaticResource MonoFont}" />
+
+                                <!-- 频率统计 -->
+                                <Grid Margin="0,8,0,0">
+                                    <Border CornerRadius="6" Background="#2D1B1B" Padding="10,6">
+                                        <TextBlock x:Name="PopupFreqText"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource ErrorBrush}"
+                                                   FontFamily="{StaticResource MonoFont}" />
+                                    </Border>
+                                </Grid>
+
+                                <!-- 分隔线 -->
+                                <Rectangle Height="1" Fill="{StaticResource BorderBrush}"
+                                           Margin="0,8,0,8" />
+
+                                <!-- 拼写建议标题 -->
+                                <TextBlock x:Name="PopupSuggestionTitle"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextMutedBrush}" />
+
+                                <!-- 建议列表 -->
+                                <ItemsControl x:Name="PopupSuggestionList"
+                                              Margin="0,6,0,0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#1A1A2E"
+                                                    CornerRadius="6"
+                                                    Padding="8,4" Margin="0,0,0,4">
+                                                <TextBlock Text="{Binding}"
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource AccentLightBrush}"
+                                                           FontFamily="{StaticResource MonoFont}" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </Popup>
                 </Grid>
             </Border>
         </Grid>
@@ -359,37 +564,69 @@
                            Style="{StaticResource SectionLabel}"
                            VerticalAlignment="Top"
                            Margin="0,2,16,0" />
-                <ItemsControl x:Name="SuggestionsList"
-                              Grid.Column="1">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Background="#1A1A2E"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Margin="0,0,8,6"
-                                    BorderBrush="{StaticResource BorderBrush}"
-                                    BorderThickness="1"
-                                    Cursor="Hand">
-                                <StackPanel>
-                                    <TextBlock FontWeight="SemiBold"
-                                               Foreground="{StaticResource ErrorBrush}"
-                                               FontSize="12"
-                                               Text="{Binding Original}" />
-                                    <TextBlock Foreground="{StaticResource TextSecondaryBrush}"
-                                               FontSize="11"
-                                               FontFamily="{StaticResource MonoFont}"
-                                               Text="{Binding SuggestionText}"
-                                               Margin="0,2,0,0" />
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+
+                <!-- 建议面板内容：三区纵向排列 -->
+                <StackPanel Grid.Column="1" x:Name="SuggestionStackPanel"
+                            Margin="0,0,0,0">
+                    <!-- 通配匹配区 -->
+                    <Border x:Name="WildcardSection"
+                            Margin="0,0,0,8"
+                            Visibility="Collapsed">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0"
+                                       x:Name="WildcardSectionLabel"
+                                       Text="通配匹配"
+                                       Foreground="{StaticResource AccentLightBrush}"
+                                       FontSize="11" FontWeight="SemiBold"
+                                       Margin="0,0,0,4" />
+                            <WrapPanel Grid.Row="1"
+                                       x:Name="WildcardItems" />
+                        </Grid>
+                    </Border>
+
+                    <!-- 拼写修正区 -->
+                    <Border x:Name="FuzzySection"
+                            Margin="0,0,0,8"
+                            Visibility="Collapsed">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0"
+                                       x:Name="FuzzySectionLabel"
+                                       Text="相似拼写"
+                                       Foreground="{StaticResource WarningBrush}"
+                                       FontSize="11" FontWeight="SemiBold"
+                                       Margin="0,0,0,4" />
+                            <WrapPanel Grid.Row="1"
+                                       x:Name="FuzzyItems" />
+                        </Grid>
+                    </Border>
+
+                    <!-- 拆分建议区 -->
+                    <Border x:Name="CompoundSection"
+                            Visibility="Collapsed">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0"
+                                       x:Name="CompoundSectionLabel"
+                                       Text="拆分建议"
+                                       Foreground="{StaticResource IgnoredBrush}"
+                                       FontSize="11" FontWeight="SemiBold"
+                                       Margin="0,0,0,4" />
+                            <WrapPanel Grid.Row="1"
+                                       x:Name="CompoundItems" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
             </Grid>
         </Border>
 

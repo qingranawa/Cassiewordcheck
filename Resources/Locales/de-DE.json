@@ -63,5 +63,15 @@
   "update.current": "Bereits aktuell",
   "update.download": "Herunterladen",
   "update.error": "Update-Prüfung fehlgeschlagen",
-  "update.new_version": "v{0} verfügbar (aktuell: v{1})"
+  "update.new_version": "v{0} verfügbar (aktuell: v{1})",
+  "mode.inline": "Inline-Modus",
+  "mode.list": "Listenansicht",
+  "mode.compare": "Vergleich",
+  "detail.frequency": "Erscheint {0} Mal",
+  "detail.suggestions": "Vorschläge",
+  "wordlist_browser.tooltip": "Wortlisten-Browser",
+  "menu.history": "Verlauf",
+  "suggestion.wildcard": "Platzhalter-Treffer",
+  "suggestion.fuzzy": "Ähnliche Schreibweise",
+  "suggestion.compound": "Zusammensetzung"
 }

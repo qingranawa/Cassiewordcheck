@@ -69,5 +69,15 @@
   "update.current": "Up to Date",
   "update.download": "Download",
   "update.error": "Update Check Failed",
-  "update.new_version": "v{0} is available (current: v{1})"
+  "update.new_version": "v{0} is available (current: v{1})",
+  "mode.inline": "Inline",
+  "mode.list": "List View",
+  "mode.compare": "Compare",
+  "detail.frequency": "Appears {0} time(s)",
+  "detail.suggestions": "Suggestions",
+  "wordlist_browser.tooltip": "Word List Browser",
+  "menu.history": "Check History",
+  "suggestion.wildcard": "Wildcard Match",
+  "suggestion.fuzzy": "Similar Spelling",
+  "suggestion.compound": "Compound Split"
 }

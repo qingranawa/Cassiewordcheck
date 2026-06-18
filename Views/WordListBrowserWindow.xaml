@@ -1,0 +1,246 @@
+<Window x:Class="CassieWordCheck.Views.WordListBrowserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="词库浏览器"
+        Width="820" Height="580"
+        MinWidth="640" MinHeight="420"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BgBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        Loaded="OnWindowLoaded">
+
+    <Window.RenderTransform>
+        <ScaleTransform ScaleX="1" ScaleY="1" />
+    </Window.RenderTransform>
+
+    <Border Margin="1" CornerRadius="8"
+            Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1">
+        <Grid Margin="16,16,16,16">
+            <Grid.RowDefinitions>
+                <!-- 搜索/排序栏 -->
+                <RowDefinition Height="Auto" />
+                <!-- 主区域：单词列表 + 统计面板 -->
+                <RowDefinition Height="*" />
+                <!-- 状态栏 -->
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- ═══ 顶部：搜索 + 排序 ═══ -->
+            <Border Grid.Row="0"
+                    CornerRadius="8"
+                    Background="{StaticResource BgBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    Padding="12,8"
+                    Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="🔍"
+                               FontSize="14"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0" />
+
+                    <TextBox Grid.Column="1"
+                             x:Name="SearchBox"
+                             Style="{StaticResource ModernTextBox}"
+                             FontSize="13"
+                             TextChanged="OnSearchTextChanged"
+                             VerticalAlignment="Center" />
+
+                    <ComboBox Grid.Column="2"
+                              x:Name="SortCombo"
+                              Style="{StaticResource ModernComboBox}"
+                              Width="140"
+                              Margin="12,0,0,0"
+                              VerticalAlignment="Center"
+                              SelectionChanged="OnSortChanged">
+                        <ComboBoxItem IsSelected="True" Content="A→Z" Tag="alpha-asc" />
+                        <ComboBoxItem Content="Z→A" Tag="alpha-desc" />
+                        <ComboBoxItem Content="短→长" Tag="length-asc" />
+                        <ComboBoxItem Content="长→短" Tag="length-desc" />
+                    </ComboBox>
+
+                    <Button Grid.Column="3"
+                            x:Name="RefreshButton"
+                            Style="{StaticResource ModernButton}"
+                            Content="⟳"
+                            Padding="10,6"
+                            Width="34"
+                            FontSize="16"
+                            Margin="8,0,0,0"
+                            ToolTip="刷新"
+                            VerticalAlignment="Center"
+                            Click="OnRefresh" />
+                </Grid>
+            </Border>
+
+            <!-- ═══ 主区域：单词列表 + 统计面板 ═══ -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="280" MinWidth="220" />
+                </Grid.ColumnDefinitions>
+
+                <!-- ─── 左：单词列表 ─── -->
+                <Border Grid.Column="0"
+                        CornerRadius="8"
+                        Background="{StaticResource BgBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        Padding="0">
+                    <Grid>
+                        <ListView x:Name="WordListView"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  VirtualizingPanel.ScrollUnit="Item"
+                                  Padding="4">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="6" Padding="8,4" Margin="0,0,0,2"
+                                            Background="{StaticResource SurfaceBrush}"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            BorderThickness="1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding Text}"
+                                                       FontSize="13"
+                                                       FontFamily="{StaticResource MonoFont}"
+                                                       VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding LengthLabel}"
+                                                       Foreground="{StaticResource TextMutedBrush}"
+                                                       FontSize="11"
+                                                       FontFamily="{StaticResource MonoFont}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="8,0,0,0" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                        <TextBlock x:Name="EmptyListLabel"
+                                   Text="词库为空"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   FontSize="14"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Visibility="Collapsed" />
+                    </Grid>
+                </Border>
+
+                <!-- ─── 右：统计面板 ─── -->
+                <Border Grid.Column="2"
+                        CornerRadius="8"
+                        Background="{StaticResource BgBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        Padding="12,12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <!-- 词长分布 -->
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <!-- 分隔 -->
+                            <RowDefinition Height="Auto" />
+                            <!-- 首字母分布 -->
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- 词长分布标题 -->
+                        <TextBlock Grid.Row="0"
+                                   x:Name="LengthDistTitle"
+                                   Text="词长分布"
+                                   Style="{StaticResource SectionLabel}"
+                                   Margin="0,0,0,6" />
+
+                        <!-- 词长分布柱状图容器 -->
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      Margin="0,0,0,8">
+                            <StackPanel x:Name="LengthDistPanel" />
+                        </ScrollViewer>
+
+                        <!-- 分隔线 -->
+                        <Border Grid.Row="2"
+                                Height="1"
+                                Background="{StaticResource BorderBrush}"
+                                Margin="0,4,0,8" />
+
+                        <!-- 首字母分布标题 -->
+                        <TextBlock Grid.Row="3"
+                                   x:Name="FirstLetterDistTitle"
+                                   Text="首字母分布"
+                                   Style="{StaticResource SectionLabel}"
+                                   Margin="0,0,0,6" />
+
+                        <!-- 首字母分布柱状图容器 -->
+                        <ScrollViewer Grid.Row="4"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel x:Name="FirstLetterDistPanel" />
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ═══ 底部：状态栏 ═══ -->
+            <Border Grid.Row="2"
+                    Margin="0,12,0,0"
+                    CornerRadius="8"
+                    Background="{StaticResource BgBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    Padding="16,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0"
+                            CornerRadius="6"
+                            Background="#1A1A2E"
+                            Padding="12,6">
+                        <TextBlock x:Name="TotalWordsLabel"
+                                   Text="总词数：0"
+                                   Foreground="{StaticResource AccentLightBrush}"
+                                   FontSize="11"
+                                   FontFamily="{StaticResource MonoFont}" />
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            CornerRadius="6"
+                            Background="#0A2E1A"
+                            Padding="12,6"
+                            Margin="8,0,0,0">
+                        <TextBlock x:Name="FilteredWordsLabel"
+                                   Text="匹配：0"
+                                   Foreground="{StaticResource SuccessBrush}"
+                                   FontSize="11"
+                                   FontFamily="{StaticResource MonoFont}" />
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

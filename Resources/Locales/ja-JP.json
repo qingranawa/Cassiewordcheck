@@ -65,5 +65,15 @@
   "update.current": "最新です",
   "update.download": "ダウンロード",
   "update.error": "確認に失敗しました",
-  "update.new_version": "v{0} が利用可能です（現在: v{1}）"
+  "update.new_version": "v{0} が利用可能です（現在: v{1}）",
+  "mode.inline": "インラインモード",
+  "mode.list": "リストモード",
+  "mode.compare": "比較モード",
+  "detail.frequency": "出現 {0} 回",
+  "detail.suggestions": "スペル提案",
+  "wordlist_browser.tooltip": "単語一覧ブラウザ",
+  "menu.history": "チェック履歴",
+  "suggestion.wildcard": "ワイルドカード一致",
+  "suggestion.fuzzy": "類似スペル",
+  "suggestion.compound": "複合語分割"
 }
