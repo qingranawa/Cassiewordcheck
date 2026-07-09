@@ -821,7 +821,7 @@ public partial class MainWindow : Window
         ResultReplaceFindLabel.Text = _localization["replace.find"] + "：";
         ResultReplaceToLabel.Text = _localization["replace.to"] + "：";
         ResultReplaceButton.ToolTip = _localization["replace.replace"];
-        SuggestionLabel.Text = $"💡 {_localization["suggestion.title"]}";
+        SuggestionLabel.Text = _localization["suggestion.title"];
 
         if (_wordlist.WordCount > 0)
         {

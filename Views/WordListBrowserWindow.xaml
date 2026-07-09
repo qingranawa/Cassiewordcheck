@@ -1,6 +1,7 @@
 <Window x:Class="CassieWordCheck.Views.WordListBrowserWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       
         Title="词库浏览器"
         Width="820" Height="580"
         MinWidth="640" MinHeight="420"
@@ -44,11 +45,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0"
-                               Text="🔍"
-                               FontSize="14"
-                               VerticalAlignment="Center"
-                               Margin="0,0,8,0" />
+                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
 
                     <TextBox Grid.Column="1"
                              x:Name="SearchBox"
@@ -73,14 +70,14 @@
                     <Button Grid.Column="3"
                             x:Name="RefreshButton"
                             Style="{StaticResource ModernButton}"
-                            Content="⟳"
                             Padding="10,6"
                             Width="34"
-                            FontSize="16"
                             Margin="8,0,0,0"
                             ToolTip="刷新"
                             VerticalAlignment="Center"
-                            Click="OnRefresh" />
+                            Click="OnRefresh">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
+                        </Button>
                 </Grid>
             </Border>
 

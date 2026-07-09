@@ -43,7 +43,7 @@ public partial class StatisticsWindow : Window
     private void UpdateLabels()
     {
         Title = _localization["stats.title"];
-        TitleLabel.Text = "📊 " + _localization["stats.title"];
+        TitleLabel.Text = _localization["stats.title"];
 
         if (ViewSelector.Items.Count >= 2)
         {

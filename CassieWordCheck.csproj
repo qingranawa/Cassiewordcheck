@@ -8,8 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>data\AAA.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>2.3.1.0</Version>
-    <FileVersion>2.3.1.0</FileVersion>
+    <Version>2.3.5.0</Version>
+    <FileVersion>2.3.5.0</FileVersion>
     <AssemblyName>CassieWordCheck</AssemblyName>
     <RootNamespace>CassieWordCheck</RootNamespace>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
@@ -22,13 +22,13 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
-  <!-- Release 配置：优化 + 单文件发布 -->
+  <!-- Release 配置：优化 + 文件夹发布（MaterialDesign 不兼容单文件） -->
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <PublishSingleFile>true</PublishSingleFile>
+    <PublishSingleFile>false</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
@@ -43,6 +43,7 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="ClosedXML" Version="0.102.3" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.3.2" />
     <PackageReference Include="System.Xml.ReaderWriter" Version="4.3.1" PrivateAssets="all" />
   </ItemGroup>
 

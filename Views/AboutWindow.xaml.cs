@@ -87,6 +87,14 @@ Awni、虚无
     private const string ChangelogText = @"
 # 更新日志
 
+## `v2.3.5`（2026-07-09）— 修复设置按钮图标与 MaterialDesign 包
+
+### Bug 修复
+- **修复工具栏设置/关于按钮图标丢失** — Segoe MDL2 Assets 字体图标改回 emoji 方式，避免渲染失效
+- **修复设置/关于按钮变成胶囊形** — 解决 TextBlock Content 撑高按钮导致 CornerRadius 过渡为椭圆
+- **修复设置/关于窗口标题栏图标缺失** — 添加 Icon="data/AAA.ico"
+- **修复 MaterialDesignThemes 包缺失** — Styles.xaml 引用了 materialDesign:PackIcon 但未安装 NuGet 包
+
 ## `v2.3.4`（2026-06-18）— 字数统计
 
 ### 新功能

@@ -1,6 +1,7 @@
 <Window x:Class="CassieWordCheck.Views.WordListManagerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       
         Title="词库管理"
         Width="860" Height="600"
         MinWidth="640" MinHeight="420"
@@ -30,16 +31,29 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" x:Name="BrowserTabBtn"
-                        Style="{StaticResource ModernButton}"
-                        Content="📖 浏览器" Padding="16,7" FontSize="13"
-                        Click="OnSwitchToBrowser" Tag="Active" />
+                        Style="{StaticResource ModernButton}" Padding="16,7" FontSize="13"
+                        Click="OnSwitchToBrowser" Tag="Active">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
+                                <TextBlock Text="浏览器" Margin="6,0,0,0" />
+                            </StackPanel>
+                        </Button>
                 <Button Grid.Column="1" x:Name="DiffTabBtn"
-                        Style="{StaticResource ModernButton}"
-                        Content="⇄ 对比" Padding="16,7" FontSize="13"
-                        Margin="8,0,0,0" Click="OnSwitchToDiff" />
+                        Style="{StaticResource ModernButton}" Padding="16,7" FontSize="13"
+                        Margin="8,0,0,0" Click="OnSwitchToDiff">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
+                                <TextBlock Text="对比" Margin="6,0,0,0" />
+                            </StackPanel>
+                        </Button>
                 <Button Grid.Column="3" Style="{StaticResource AccentButton}"
-                        Content="📂 更换词库" Padding="14,7" FontSize="12"
-                        Click="OnChangeWordList" />
+                        Padding="14,7" FontSize="12"
+                        Click="OnChangeWordList">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
+                                <TextBlock Text="更换词库" Margin="6,0,0,0" />
+                            </StackPanel>
+                        </Button>
             </Grid>
 
             <!-- 浏览器页 -->
@@ -56,7 +70,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="🔍" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
                         <TextBox Grid.Column="1" x:Name="SearchBox" Style="{StaticResource ModernTextBox}" FontSize="13" TextChanged="OnSearchTextChanged" />
                         <ComboBox Grid.Column="2" x:Name="SortCombo" Style="{StaticResource ModernComboBox}" Width="140" Margin="12,0,0,0" SelectionChanged="OnSortChanged">
                             <ComboBoxItem IsSelected="True" Content="A→Z" Tag="alpha-asc" />
@@ -126,7 +140,12 @@
                         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                         <TextBlock Text="对比词库：" FontSize="13" VerticalAlignment="Center" />
                         <TextBlock Grid.Column="1" x:Name="DiffTargetLabel" Text="未选择" Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" VerticalAlignment="Center" Margin="8,0,0,0" />
-                        <Button Grid.Column="2" Style="{StaticResource ModernButton}" Content="📂 选择词库" Padding="12,6" FontSize="12" Click="OnSelectDiffTarget" />
+                        <Button Grid.Column="2" Style="{StaticResource ModernButton}" Padding="12,6" FontSize="12" Click="OnSelectDiffTarget">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
+                                <TextBlock Text="选择词库" Margin="6,0,0,0" />
+                            </StackPanel>
+                        </Button>
                     </Grid>
                 </Border>
                 <Grid Grid.Row="1">

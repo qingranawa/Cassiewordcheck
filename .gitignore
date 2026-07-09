@@ -33,6 +33,11 @@ appsettings*.json
 
 ## Publish outputs
 dist/
+dist2/
 CASSIE CWC Tool*.7z
 CASSIE CWC Tool*.zip
 CASSIE CWC Tool（CASSIE Word Check）/
+
+## Temp / debug
+%TEMP%/
+debug.txt

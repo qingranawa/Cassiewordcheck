@@ -49,7 +49,7 @@ public partial class WordCountWindow : Window
 
     private void UpdateLabels()
     {
-        TitleLabel.Text = "📊 " + _localization["stats.title"];
+        TitleLabel.Text = _localization["stats.title"];
         Title = _localization["stats.title"];
         FreqLabel.Text = _localization["wordcount.freq"];
         LengthLabel.Text = _localization["wordcount.length"];

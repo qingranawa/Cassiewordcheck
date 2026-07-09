@@ -23,11 +23,11 @@ public partial class DiffWindow : Window
     private void OnWindowLoaded(object sender, RoutedEventArgs e)
     {
         Title = _localization["diff.title"];
-        TitleLabel.Text = "⇄ " + _localization["diff.title"];
-        LoadRightButton.Content = "📂 " + _localization["diff.load"];
+        TitleLabel.Text = _localization["diff.title"];
+        LoadRightButton.Content = _localization["diff.load"];
         LeftSectionLabel.Text = _localization["diff.left_only"];
         RightSectionLabel.Text = _localization["diff.right_only"];
-        ExportButton.Content = "📥 " + _localization["diff.export"];
+        ExportButton.Content = _localization["diff.export"];
         StatusLabel.Text = _localization["diff.prompt"];
 
         // 如果当前词库为空，显示提示
