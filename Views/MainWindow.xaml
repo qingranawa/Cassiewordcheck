@@ -11,7 +11,17 @@
         RenderOptions.BitmapScalingMode="HighQuality"
         Loaded="OnMainWindowLoaded">
 
-    <Grid Margin="24,16,24,16">
+    <Grid>
+        <!-- 氛围光晕装饰 -->
+        <Ellipse Width="320" Height="320"
+                 Fill="{StaticResource AccentGradientBrush}"
+                 Opacity="0.06"
+                 HorizontalAlignment="Right"
+                 VerticalAlignment="Top"
+                 Margin="0,-80,-80,0"
+                 IsHitTestVisible="False" />
+
+        <Grid Margin="24,16,24,16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -19,17 +29,23 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- ── Toolbar Card (joined with status info) ──────────────── -->
-            <Border x:Name="ToolbarCard" Grid.Row="0"
-                    Background="{StaticResource SurfaceBrush}"
+            <!-- ── Toolbar Card (Double-Bezel: 外层毛边 + 内层主体) ──── -->
+            <Border Grid.Row="0"
+                    Background="#0E0E12"
                     BorderBrush="{StaticResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="12"
-                    Margin="0,0,0,6"
-                    Padding="0">
+                    CornerRadius="14"
+                    Margin="0,0,0,8"
+                    Padding="1.5">
                 <Border.Effect>
-                    <DropShadowEffect BlurRadius="10" Opacity="0.18" ShadowDepth="3" Direction="270" Color="#000000" />
+                    <DropShadowEffect BlurRadius="12" Opacity="0.2" ShadowDepth="4" Direction="270" Color="#000000" />
                 </Border.Effect>
+                <Border x:Name="ToolbarCard"
+                        Background="{StaticResource SurfaceBrush}"
+                        BorderBrush="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="12.5"
+                        Padding="0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -37,7 +53,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- Top row: toolbar buttons -->
-                    <Grid Grid.Row="0" Margin="20,0,20,0" Height="48">
+                    <Grid Grid.Row="0" Margin="16,0,16,0" Height="48">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
@@ -58,8 +74,22 @@
                                 BorderThickness="1"
                                 Background="Transparent"
                                 VerticalAlignment="Center">
-                            <Image x:Name="ToolbarIcon" Width="24" Height="24"
-                                   Stretch="UniformToFill" />
+                            <Grid>
+                                <!-- 后备色块（图片加载失败时显示玫瑰色圆点） -->
+                                <Ellipse Width="16" Height="16"
+                                         Fill="{StaticResource AccentGradientBrush}"
+                                         Opacity="0.35" />
+                                <!-- Clip 显式裁剪圆角，否则 CornerRadius 不会裁子元素 -->
+                                <Image x:Name="ToolbarIcon" Width="26" Height="26"
+                                       Stretch="UniformToFill"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center">
+                                    <Image.Clip>
+                                        <RectangleGeometry RadiusX="5" RadiusY="5"
+                                                           Rect="0,0,26,26" />
+                                    </Image.Clip>
+                                </Image>
+                            </Grid>
                         </Border>
 
                         <TextBlock Grid.Column="1"
@@ -72,20 +102,18 @@
                         <Button Grid.Column="2"
                                 x:Name="WhitelistButton"
                                 Style="{StaticResource ModernButton}"
+                                Height="32"
+                                Content="白名单"
                                 Padding="14,6"
                                 Margin="0,0,10,0"
                                 VerticalAlignment="Center"
-                                Click="OnOpenWhitelist">
-                            <StackPanel Orientation="Horizontal">
-                                
-                                <TextBlock Text="白名单" Margin="6,0,0,0" />
-                            </StackPanel>
-                        </Button>
+                                Click="OnOpenWhitelist" />
 
                         <ComboBox Grid.Column="3"
                                   x:Name="ModeCombo"
                                   Style="{StaticResource ModernComboBox}"
                                   Width="110"
+                                  Height="32"
                                   Margin="4,0,8,0"
                                   VerticalAlignment="Center"
                                   SelectionChanged="OnModeChanged" />
@@ -93,61 +121,61 @@
                         <Button Grid.Column="4"
                                 x:Name="StatsButton"
                                 Style="{StaticResource ModernButton}"
-                                Padding="8,6"
-                                Width="32"
+                                Width="36" Height="32"
+                                Padding="0"
                                 Margin="4,0,0,0"
                                 VerticalAlignment="Center"
                                 ToolTip="统计面板"
                                 Click="OnOpenStatistics">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
+                            <TextBlock Text="📊" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
                         </Button>
 
                         <Button Grid.Column="5"
                                 x:Name="HistoryButton"
                                 Style="{StaticResource ModernButton}"
-                                Padding="8,6"
-                                Width="32"
+                                Width="36" Height="32"
+                                Padding="0"
                                 Margin="4,0,0,0"
                                 VerticalAlignment="Center"
                                 ToolTip="检查历史"
                                 Click="OnToggleHistory">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
+                            <TextBlock Text="📋" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
                         </Button>
 
                         <Button Grid.Column="6"
                                 x:Name="WordCountButton"
                                 Style="{StaticResource ModernButton}"
-                                Padding="8,6"
-                                Width="32"
+                                Width="36" Height="32"
+                                Padding="0"
                                 Margin="4,0,0,0"
                                 VerticalAlignment="Center"
                                 ToolTip="字数统计"
                                 Click="OnOpenWordCount">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
+                            <TextBlock Text="✍" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
                         </Button>
 
                         <Button Grid.Column="7"
                                 x:Name="WordListBrowserButton"
                                 Style="{StaticResource ModernButton}"
-                                Padding="14,6"
-                                FontSize="13"
+                                Height="32"
+                                Padding="12,6"
                                 Margin="4,0,0,0"
                                 VerticalAlignment="Center"
                                 ToolTip="词库管理"
                                 Click="OnOpenWordListBrowser">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
-                                <TextBlock Text="词库管理" Margin="6,0,0,0" />
+                                <TextBlock Text="📚" FontSize="14" VerticalAlignment="Center" />
+                                <TextBlock Text="词库管理" Margin="6,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
 
-	                        <Button Grid.Column="8"
+                        <Button Grid.Column="8"
                                 x:Name="SettingsButton"
                                 Style="{StaticResource ModernButton}"
                                 Content="⚙"
-                                Padding="8,6"
-                                Width="32"
-                                FontSize="17"
+                                Width="36" Height="32"
+                                Padding="0"
+                                FontSize="18"
                                 Margin="4,0,0,0"
                                 VerticalAlignment="Center"
                                 ToolTip="设置"
@@ -157,9 +185,9 @@
                                 x:Name="AboutButton"
                                 Style="{StaticResource ModernButton}"
                                 Content="ⓘ"
-                                Padding="8,6"
-                                Width="32"
-                                FontSize="17"
+                                Width="36" Height="32"
+                                Padding="0"
+                                FontSize="18"
                                 Margin="4,0,0,0"
                                 VerticalAlignment="Center"
                                 ToolTip="关于"
@@ -204,27 +232,40 @@
                 </Grid>
             </Grid>
         </Border>
+    </Border>
 
         <!-- ═══════════════════════════════════════════════════════════════
              Main Content - Input & Result Cards
              ═══════════════════════════════════════════════════════════════ -->
-        <Grid x:Name="MainContentGrid" Grid.Row="1" Margin="0,0,0,6"
+        <Grid x:Name="MainContentGrid" Grid.Row="1" Margin="0,0,0,8"
               RenderTransformOrigin="0.5,0.5">
             <Grid.RenderTransform>
                 <TranslateTransform Y="0" />
             </Grid.RenderTransform>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- ─── LEFT: Input Card ───────────────────────────────── -->
-            <Border x:Name="InputCard"
-                    Grid.Column="0"
-                    Style="{StaticResource CardStyle}"
-                    Padding="0"
-                    RenderTransformOrigin="0.5,0.5">
+            <!-- ─── LEFT: Input Card (Double-Bezel) ────────────────── -->
+            <Border Grid.Column="0"
+                    CornerRadius="14"
+                    Background="#0E0E12"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    Padding="1.5">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Opacity="0.18" ShadowDepth="3" Direction="270" Color="#000000" />
+                </Border.Effect>
+                <Border x:Name="InputCard"
+                        Style="{StaticResource CardStyle}"
+                        BorderThickness="0"
+                        Background="{StaticResource SurfaceBrush}"
+                        CornerRadius="12.5"
+                        Padding="0"
+                        Effect="{x:Null}"
+                        RenderTransformOrigin="0.5,0.5">
                 <Border.RenderTransform>
                     <ScaleTransform ScaleX="1" ScaleY="1" />
                 </Border.RenderTransform>
@@ -259,22 +300,22 @@
                             <Button Grid.Column="3"
                                     x:Name="FileOpenButton"
                                     Style="{StaticResource ModernButton}"
-                                    Width="24" Height="24"
+                                    Width="28" Height="28"
                                     Padding="0"
                                     ToolTip="打开文件 / 导入单词"
                                     Click="OnFileOpenOrImport">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="15" Width="14" Height="14" VerticalAlignment="Center" TextAlignment="Center" />
-                        </Button>
+                                <TextBlock Text="📂" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            </Button>
                             <Button Grid.Column="4"
                                     x:Name="ClearButton"
                                     Style="{StaticResource DangerButton}"
-                                    Width="24" Height="24"
+                                    Width="28" Height="28"
                                     Padding="0"
                                     Margin="4,0,0,0"
                                     ToolTip="清空输入"
                                     Click="OnClearInput">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="15" Width="14" Height="14" VerticalAlignment="Center" TextAlignment="Center" />
-                        </Button>
+                                <TextBlock Text="✕" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            </Button>
                         </Grid>
                     </Border>
 
@@ -296,13 +337,26 @@
                              PreviewKeyUp="OnInputPreviewKeyUp" />
                 </Grid>
             </Border>
+        </Border>
 
-            <!-- ─── RIGHT: Result Card ──────────────────────────────── -->
-            <Border x:Name="ResultCard"
-                    Grid.Column="2"
-                    Style="{StaticResource CardStyle}"
-                    Padding="0"
-                    RenderTransformOrigin="0.5,0.5">
+            <!-- ─── RIGHT: Result Card (Double-Bezel) ──────────────── -->
+            <Border Grid.Column="2"
+                    CornerRadius="14"
+                    Background="#0E0E12"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    Padding="1.5">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Opacity="0.18" ShadowDepth="3" Direction="270" Color="#000000" />
+                </Border.Effect>
+                <Border x:Name="ResultCard"
+                        Style="{StaticResource CardStyle}"
+                        BorderThickness="0"
+                        Background="{StaticResource SurfaceBrush}"
+                        CornerRadius="12.5"
+                        Padding="0"
+                        Effect="{x:Null}"
+                        RenderTransformOrigin="0.5,0.5">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <TranslateTransform X="0" Y="0" />
@@ -339,32 +393,35 @@
                             <Button Grid.Column="2"
                                     x:Name="ExportButton"
                                     Style="{StaticResource ModernButton}"
-                                    Padding="10,3"
-                                    FontSize="11"
+                                    Padding="12,5"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
                                     Margin="0,0,6,0"
                                     Click="OnExportResult">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="15" Width="14" Height="14" VerticalAlignment="Center" TextAlignment="Center" />
-                                <TextBlock Text="导出" Margin="4,0,0,0" />
+                                <TextBlock Text="📤" FontSize="14" VerticalAlignment="Center" />
+                                <TextBlock Text="导出" Margin="4,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
                             <Button Grid.Column="3"
                                     x:Name="CopyButton"
                                     Style="{StaticResource ModernButton}"
-                                    Padding="10,3"
-                                    FontSize="11"
+                                    Padding="12,5"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
                                     Click="OnCopyResult">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="15" Width="14" Height="14" VerticalAlignment="Center" TextAlignment="Center" />
-                                <TextBlock Text="复制" Margin="4,0,0,0" />
+                                <TextBlock Text="📋" FontSize="14" VerticalAlignment="Center" />
+                                <TextBlock Text="复制" Margin="4,0,0,0" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
                             <Button Grid.Column="4"
                                     x:Name="ResultReplaceButton"
                                     Style="{StaticResource ModernButton}"
                                     Content="替换"
-                                    Padding="10,3"
-                                    FontSize="11"
+                                    Padding="12,5"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
                                     Margin="4,0,0,0"
                                     Click="OnToggleResultReplace" />
                         </Grid>
@@ -482,7 +539,7 @@
                                         Width="24" Height="24"
                                         Padding="0" Margin="4,0,0,0"
                                         Click="OnReplaceDismiss">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="15" Width="14" Height="14" VerticalAlignment="Center" TextAlignment="Center" />
+                                <TextBlock Text="✕" FontSize="14" VerticalAlignment="Center" TextAlignment="Center" />
                             </Button>
                             </Grid>
                         </Border>
@@ -678,6 +735,7 @@
                     </Popup>
                 </Grid>
             </Border>
+        </Border>
         </Grid>
 
         <!-- ═══════════════════════════════════════════════════════════════
@@ -690,7 +748,7 @@
                 BorderThickness="1"
                 CornerRadius="12"
                 Padding="20,10"
-                Margin="0,0,0,6"
+                Margin="0,0,0,8"
                 Visibility="Collapsed"
                 RenderTransformOrigin="0.5,0"
                 Opacity="0">
@@ -706,7 +764,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top" Margin="0,2,16,0">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
+                            <TextBlock Text="💡" FontSize="15" VerticalAlignment="Center" TextAlignment="Center" />
                             <TextBlock x:Name="SuggestionLabel" Text="建议" Style="{StaticResource SectionLabel}" Margin="8,0,0,0" />
                         </StackPanel>
 
@@ -775,19 +833,24 @@
             </Grid>
         </Border>
 
-        <!-- ═══════════════════════════════════════════════════════════════
-             Stats Bar
-             ═══════════════════════════════════════════════════════════════ -->
-        <Border x:Name="StatsBar" Grid.Row="3"
-                Background="{StaticResource SurfaceBrush}"
+                <!-- Stats Bar (Double-Bezel) -->
+        <Border Grid.Row="3"
+                CornerRadius="14"
+                Background="#0E0E12"
                 BorderBrush="{StaticResource BorderBrush}"
                 BorderThickness="1"
-                CornerRadius="12"
-                Padding="20,8"
-                MinHeight="40">
+                Padding="1.5"
+                Margin="0,0,0,0">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="10" Opacity="0.18" ShadowDepth="3" Direction="270" Color="#000000" />
             </Border.Effect>
+            <Border x:Name="StatsBar"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
+                    CornerRadius="12.5"
+                    Padding="16,12"
+                    MinHeight="44">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -797,88 +860,80 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Available -->
-                <Border Grid.Column="0" CornerRadius="6" Background="#0A2E1A" Padding="10,6">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" CornerRadius="6" Background="#0A2E1A" Padding="12,6">
+                    <StackPanel Orientation="Horizontal">
                         <Ellipse Width="6" Height="6" Fill="{StaticResource SuccessBrush}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="1" x:Name="AvailableLabel"
+                        <TextBlock x:Name="AvailableLabel"
                                    Text="可用：0"
                                    Foreground="{StaticResource SuccessBrush}"
                                    FontSize="11" FontFamily="{StaticResource MonoFont}"
-                                   Margin="6,0,0,0" />
-                    </Grid>
+                                   Margin="6,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
                 </Border>
 
                 <!-- Unavailable -->
-                <Border Grid.Column="1" CornerRadius="6" Background="#2D1B1B" Padding="10,6" Margin="8,0,0,0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <Border Grid.Column="1" CornerRadius="6" Background="#2D1B1B" Padding="12,6" Margin="8,0,0,0">
+                    <StackPanel Orientation="Horizontal">
                         <Ellipse Width="6" Height="6" Fill="{StaticResource ErrorBrush}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="1" x:Name="UnavailableLabel"
+                        <TextBlock x:Name="UnavailableLabel"
                                    Text="不可用：0"
                                    Foreground="{StaticResource ErrorBrush}"
                                    FontSize="11" FontFamily="{StaticResource MonoFont}"
-                                   Margin="6,0,0,0" />
-                    </Grid>
+                                   Margin="6,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
                 </Border>
 
                 <!-- Ignored -->
-                <Border Grid.Column="2" CornerRadius="6" Background="#1A1A24" Padding="10,6" Margin="8,0,0,0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <Border Grid.Column="2" CornerRadius="6" Background="#1A1A24" Padding="12,6" Margin="8,0,0,0">
+                    <StackPanel Orientation="Horizontal">
                         <Ellipse Width="6" Height="6" Fill="{StaticResource IgnoredBrush}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" x:Name="IgnoredLabel"
+                        <TextBlock x:Name="IgnoredLabel"
                                    Text="已忽略：0"
                                    Foreground="{StaticResource IgnoredBrush}"
                                    FontSize="11" FontFamily="{StaticResource MonoFont}"
-                                   Margin="6,0,0,0" />
-                    </Grid>
+                                   Margin="6,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
                 </Border>
 
-                <!-- Coverage progress bar + 百分比 -->
-                <Grid Grid.Column="3" VerticalAlignment="Center" Margin="12,0,0,0"
-                      MaxWidth="300">
+                <!-- Coverage progress bar + percentage -->
+                <Grid Grid.Column="3"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Right"
+                      MaxWidth="300"
+                      Margin="16,0,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="50" />
                     </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" CornerRadius="8" Background="#1A1A24" Height="16" Margin="0,0,8,0"
-                            x:Name="CoverageTrack">
-                        <Grid>
-                            <Rectangle x:Name="CoverageBar"
-                                       HorizontalAlignment="Left"
-                                       Width="0"
-                                       MinWidth="4"
-                                       Fill="{StaticResource AccentGradientBrush}"
-                                       RadiusX="8" RadiusY="8" />
-                        </Grid>
+                    <!-- Track -->
+                    <Border Grid.Column="0"
+                            CornerRadius="1"
+                            Background="#E8E8E8"
+                            Height="8"
+                            VerticalAlignment="Center"
+                            Margin="0,0,8,0">
+                        <Border x:Name="CoverageBar"
+                                HorizontalAlignment="Left"
+                                Width="0"
+                                CornerRadius="1"
+                                Background="{StaticResource AccentBrush}"
+                                Height="8" />
                     </Border>
-                    <TextBlock Grid.Column="1" x:Name="CoverageLabel"
+                    <!-- Percentage (fixed 50px width -> right-aligned) -->
+                    <TextBlock Grid.Column="1"
+                               x:Name="CoverageLabel"
                                Text="0%"
                                Foreground="{StaticResource AccentLightBrush}"
-                               FontSize="13" FontWeight="SemiBold"
+                               FontSize="12" FontWeight="SemiBold"
                                FontFamily="{StaticResource MonoFont}"
-                               VerticalAlignment="Center" />
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Right"
+                               TextAlignment="Right"
+                               Width="50" />
                 </Grid>
             </Grid>
         </Border>
+        </Border>
+    </Grid>
     </Grid>
 </Window>

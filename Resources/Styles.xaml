@@ -58,7 +58,7 @@
 
     <!-- ─── Typography ──────────────────────────────────────────── -->
     <FontFamily x:Key="DisplayFont">Segoe UI Variable Display, Segoe UI, sans-serif</FontFamily>
-    <FontFamily x:Key="TextFont">Segoe UI Variable Text, Segoe UI, sans-serif</FontFamily>
+    <FontFamily x:Key="TextFont">Microsoft YaHei, Segoe UI Variable Text, Segoe UI, sans-serif</FontFamily>
     <FontFamily x:Key="MonoFont">Cascadia Code, Consolas, monospace</FontFamily>
 
     <!-- ═══════════════════════════════════════════════════════════════
@@ -68,7 +68,7 @@
         <Setter Property="Background" Value="{StaticResource BgBrush}" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource TextFont}" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
     </Style>
 
@@ -207,7 +207,7 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="12,8" />
         <Setter Property="FontFamily" Value="{StaticResource TextFont}" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="CaretBrush" Value="{StaticResource AccentBrush}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -246,7 +246,7 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="12" />
         <Setter Property="FontFamily" Value="{StaticResource TextFont}" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="IsReadOnly" Value="True" />
         <Setter Property="IsDocumentEnabled" Value="True" />
         <Setter Property="Template">
@@ -413,9 +413,9 @@
                             <ControlTemplate TargetType="ComboBoxItem">
                                 <Border x:Name="hoverBorder"
                                         Background="{TemplateBinding Background}"
-                                        CornerRadius="6"
+                                        CornerRadius="8"
                                         Padding="{TemplateBinding Padding}"
-                                        Margin="4,2"
+                                        Margin="2,2"
                                         SnapsToDevicePixels="True">
                                     <ContentPresenter />
                                 </Border>
@@ -443,7 +443,7 @@
     <Style x:Key="ModernCheckBox" TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource TextFont}" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
@@ -492,15 +492,18 @@
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════════════
-         Card / Section Label
+         Card — 统一卡片样式
+         Padding="16,12"（左右16px，上下12px）
+         CornerRadius="8"
+         内部子元素用 StackPanel Spacing="10" 或 Grid 行列栅格
+         禁止子元素独立设 Margin
          ═══════════════════════════════════════════════════════════════ -->
-    <!-- Card: subtle border + very light shadow -->
     <Style x:Key="CardStyle" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16,12" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Effect">
             <Setter.Value>

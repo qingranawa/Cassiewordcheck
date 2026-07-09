@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Documents;
@@ -5,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using CassieWordCheck.Models;
 using CassieWordCheck.Services;
 
@@ -87,12 +89,68 @@ Awni、虚无
     private const string ChangelogText = @"
 # 更新日志
 
+## `v2.4.3`（2026-07-09）— <> 标签全面忽略 · Inno Setup 6 安装包 · CI/CD 自动发行
+### 功能调整
+- **`<>` 标签全面忽略** — 不再只忽略 `<split>`、`<size=`、`<color=` 三种，所有 `<...>` 内的中文/内容全部自动跳过，包括废弃的 `<link="">` 格式
+
+### 其他
+- **Inno Setup 6 安装包** — 改用专业安装程序替代 zip 发布，含桌面快捷方式/开始菜单/自动管理员提权
+- **CI/CD 自动发行** — 推送 tag 自动编译 → 打包 → 上传 setup.exe 到 GitHub Releases
+- **程序集版本同步** — Version / FileVersion 统一随 tag 更新
+
+## `v2.4.2`（2026-07-09）— 图标加载修复 · 设置页 UI 统一 · 清理报错语气词
+
+### Bug 修复
+- **修复工具栏/关于页图标（AAA.JPG）永远加载失败** — `using (var stream) bitmap.StreamSource = stream;` 缺少大括号导致流在 `EndInit()` 前被释放，JPG 加载静默失败
+- **去除所有弹窗报错信息中的「喵～」** — 保持专业感，App.xaml.cs 两处 + MainWindow.xaml.cs 两处
+
+### 界面调整
+- **设置页下拉框对齐主页功能区风格** — LanguageCombo / FontSizeCombo 固定 Height=32、设置 Width 限制，与工具栏 ModeCombo 保持视觉一致
+
+## `v2.4.1`（2026-07-09）— 字体修复 · 图标后备 · 移除开发者卡片
+
+### Bug 修复
+- **修复中文字体渲染大小不一** — 全局默认字体改为 `Microsoft YaHei` 优先（微软雅汉），统一所有控件 FontSize 基准为 13，消除中英文混排时字号参差
+- **修复工具栏/关于页图标渲染** — `Image.Clip` 显式设置 `RectangleGeometry` 裁剪圆角（WPF 的 `ClipToBounds` 只裁矩形不裁圆角），28px 图标容器内 26px 图片+5px 圆角裁剪；后备显示玫瑰色 Ellipse 圆点而非 emoji
+- **移除关于页中不合理的开发者卡片** — 删除右侧「清然·2816401189」信息卡片，头部改为双列布局自动居中
+
+## `v2.4.0`（2026-07-09）— 全面视觉精打细磨 · 发布目录优化
+
+### 视觉升级
+- **新增卡片式标签页** — 关于窗口标签从底部线指示改为卡片式激活，选中态带光晕阴影
+- **Double-Bezel 嵌套卡片结构** — 所有窗口卡片采用双层嵌套（外层毛边 + 内层主体），创造物理纵深
+- **全新的关于窗口布局** — 头部整合项目图标（AAA.JPG）+ 版本徽章 + 开发者信息卡片
+- **渐变分割线** — 直线分割线改为渐变式（透明到玫瑰色到透明），增加视觉精致度
+- **氛围光晕装饰** — 各窗口右上角玫瑰色径向渐变半透明光晕
+- **GitHub 链接** — 关于页头部加入仓库链接，点击自动浏览器打开
+- **统一入场动画** — 关于窗口保持弹性缩放 + 卡片错开延迟入场
+
+### 发布目录
+- **新增 App.xaml.cs 自定义程序集解析器** — 支持 natives/ + runtimes/ 子目录布局
+- **新增静态构造 PATH 配置** — WPF 原生 DLL 可从 natives/ 子目录加载
+- **新增 pack-dist.ps1 + pack-dist.py 打包脚本** — 自动分类系统 DLL
+- **目录结构优化** — 原生 DLL 移入 natives/（13 个），托管 DLL 移入 runtimes/（227 个），根目录保留仅 12 个核心文件
+
+## `v2.3.6`（2026-07-09）— 全面 UI 修复 · 稳定性增强
+
+### Bug 修复
+- **修复设置/关于按钮导致崩溃** — 添加全局异常捕获 + try-catch 保护对话框创建，移除不稳定的 Icon 引用
+- **修复工具栏按钮对齐混乱** — 统一所有按钮尺寸为 Height 32，图标按钮统一 Width 36，标准化间距/边距
+- **修复字数统计图标消失** — Segoe MDL2 Assets 替换为通用 emoji（✍），消除字体版本兼容问题
+- **修复设置/关于图标仅显示一半** — 按钮宽度从 32 增至 36，Padding 归零，确保 emoji 完整渲染
+- **修复其它 Segoe MDL2 Assets 图标适配** — 统计面板/历史/词库管理/文件打开/清空按钮全部改用通用 emoji
+- **修复下拉框弹窗圆角不一致** — ComboBoxItem 圆角从 6 调至 8 与主控件统一
+- **统一卡片左右边距** — 工具栏内边距从 20 改为 16，与输入/结果卡片对齐
+- **修复卡片间距不统一** — 输入/结果两栏间距从 12 改为 8，顶部/底部间距统一为 8px
+- **修复结果卡片按钮字体粗糙** — FontSize 11→12、FontWeight SemiBold、Padding 10,3→12,5，替换 Segoe MDL2 Assets 为 emoji
+- **修复统计区进度条布局锁定** — 百分比列固定宽度 50px 防挤压，进度条高度 6→8，背景 #E8E8E8，圆角 Radius=""1""，QuadraticEase 改为 EaseOut 顺滑过渡
+
 ## `v2.3.5`（2026-07-09）— 修复设置按钮图标与 MaterialDesign 包
 
 ### Bug 修复
 - **修复工具栏设置/关于按钮图标丢失** — Segoe MDL2 Assets 字体图标改回 emoji 方式，避免渲染失效
 - **修复设置/关于按钮变成胶囊形** — 解决 TextBlock Content 撑高按钮导致 CornerRadius 过渡为椭圆
-- **修复设置/关于窗口标题栏图标缺失** — 添加 Icon="data/AAA.ico"
+- **修复设置/关于窗口标题栏图标缺失** — 添加 Icon 属性引用 AAA.ico
 - **修复 MaterialDesignThemes 包缺失** — Styles.xaml 引用了 materialDesign:PackIcon 但未安装 NuGet 包
 
 ## `v2.3.4`（2026-06-18）— 字数统计
@@ -224,14 +282,14 @@ Awni、虚无
 ---
 ";
 
-    // 0 = Features, 1 = Changelog, 2 = AboutInfo
+    // 0 = Features, 1 = Changelog, 2 = AboutInfo, 3 = Disclaimer
     private int _activeTab;
-    private const double IndicatorWidth = 36;
 
     public AboutWindow()
     {
         InitializeComponent();
         VersionLabel.Text = $"版本 {AppInfo.Version}";
+        VersionBadge.Text = $"v{AppInfo.Version}";
         this.EnableDarkTitleBar();
         ContentArea.Opacity = 1;
         ContentArea.RenderTransform = new TranslateTransform(0, 0);
@@ -274,17 +332,14 @@ Awni、虚无
         sb.Children.Add(fade);
         sb.Begin(this);
 
-        // ── 各卡片错开入场 ──
-        AnimateElement(AppIconBorder, 0.9, 1, 80, 0, 0.1, 0.3);
-        // 内容区直接淡入
+        // ── 应用图标错开入场（若已加载真实图标则保留入场） ──
+        // 图标容器用简单淡入即可
+        // 内容区淡入
         ContentArea.Opacity = 0;
         var contentFade = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromSeconds(0.35)));
         contentFade.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
         contentFade.BeginTime = TimeSpan.FromSeconds(0.25);
         ContentArea.BeginAnimation(OpacityProperty, contentFade);
-
-        // 延迟一帧定位指示条（确保布局完成）
-        Dispatcher.BeginInvoke(() => AnimateIndicatorTo(_activeTab, false));
     }
 
     private void LoadAppIcon()
@@ -318,13 +373,23 @@ Awni、虚无
                     bitmap.BeginInit();
                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
                     using (var stream = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                    {
                         bitmap.StreamSource = stream;
-                    bitmap.EndInit();
+                        bitmap.EndInit();
+                    }
                     AppIconImage.Source = bitmap;
                 }
             }
         }
+        catch { /* 图标加载失败时保持 Ellipse 后备色块 */ }
+    }
+
+    // ── GitHub 链接 ───────────────────────────────────────────────
+    private void OnGitHubLink(object sender, RequestNavigateEventArgs e)
+    {
+        try { Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true }); }
         catch { /* 静默 */ }
+        e.Handled = true;
     }
 
     // ── 标签页切换 ────────────────────────────────────────────
@@ -349,9 +414,6 @@ Awni、虚无
             _ => DisclaimerText,
         };
 
-        // 指示条动画（动态计算位置）
-        AnimateIndicatorTo(tabIndex);
-
         // 内容交叉淡出/淡入
         var fadeOut = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromMilliseconds(180)));
         fadeOut.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn };
@@ -366,48 +428,21 @@ Awni、虚无
         ContentArea.BeginAnimation(OpacityProperty, fadeOut);
     }
 
+    /// <summary>
+    /// 激活指定标签页：设置 Border.Tag 触发 XAML 中的视觉样式切换
+    /// </summary>
     private void SetActiveTab(int tabIndex)
     {
         FeaturesTab.Tag = tabIndex == 0 ? "Active" : null;
         ChangelogTab.Tag = tabIndex == 1 ? "Active" : null;
         AboutInfoTab.Tag = tabIndex == 2 ? "Active" : null;
         DisclaimerTab.Tag = tabIndex == 3 ? "Active" : null;
-    }
 
-    // ── 动态计算指示条位置（用 TranslatePoint 确保准确定位）─────
-    private void AnimateIndicatorTo(int tabIndex, bool animate = true)
-    {
-        var tabText = tabIndex switch
-        {
-            0 => (FrameworkElement)FeaturesTab,
-            1 => ChangelogTab,
-            2 => AboutInfoTab,
-            _ => DisclaimerTab,
-        };
-
-        // 计算 TextBlock 在 TabGrid 中的中心 X 坐标
-        var origin = new Point(0, 0);
-        var posInGrid = tabText.TranslatePoint(origin, TabGrid);
-        var textCenterX = posInGrid.X + tabText.ActualWidth / 2;
-        var targetLeft = textCenterX - IndicatorWidth / 2;
-
-        // 限制最小值
-        if (targetLeft < 0) targetLeft = 0;
-
-        var targetMargin = new Thickness(targetLeft, 0, 0, 0);
-
-        if (animate)
-        {
-            var anim = new ThicknessAnimation(
-                TabIndicator.Margin, targetMargin,
-                new Duration(TimeSpan.FromMilliseconds(300)));
-            anim.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
-            TabIndicator.BeginAnimation(Border.MarginProperty, anim);
-        }
-        else
-        {
-            TabIndicator.Margin = targetMargin;
-        }
+        // 同步设置子 TextBlock 的 Tag
+        FeaturesTabText.Tag = tabIndex == 0 ? "Active" : null;
+        ChangelogTabText.Tag = tabIndex == 1 ? "Active" : null;
+        AboutInfoTabText.Tag = tabIndex == 2 ? "Active" : null;
+        DisclaimerTabText.Tag = tabIndex == 3 ? "Active" : null;
     }
 
     // ── 禁止文本选中（只允许超链接点击）────────────────────────

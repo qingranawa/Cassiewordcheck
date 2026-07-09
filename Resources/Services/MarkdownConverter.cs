@@ -15,7 +15,7 @@ public static class MarkdownConverter
     private static readonly Brush TextBrush = new SolidColorBrush(Color.FromRgb(0xF5, 0xF5, 0xF5));
     private static readonly Brush MutedBrush = new SolidColorBrush(Color.FromRgb(0x6B, 0x72, 0x80));
 
-    private static readonly FontFamily BodyFont = new("Segoe UI Variable Text, Segoe UI, sans-serif");
+    private static readonly FontFamily BodyFont = new("Microsoft YaHei, Segoe UI Variable Text, Segoe UI, sans-serif");
     private static readonly FontFamily MonoFont = new("Cascadia Code, Consolas, monospace");
 
     public static FlowDocument Convert(string markdown, double width)

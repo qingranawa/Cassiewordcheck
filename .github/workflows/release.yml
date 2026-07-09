@@ -25,10 +25,19 @@ jobs:
       - name: Clean debug symbols
         run: Remove-Item "dist/*.pdb" -ErrorAction SilentlyContinue
 
-      - name: Package zip
-        run: Compress-Archive -Path "dist/*" -DestinationPath "CASSIE CWC Tool（CASSIE Word Check）.zip" -Force
+      - name: Install Inno Setup 6
+        run: |
+          iwr -useb "https://jrsoftware.org/download.php/is.exe" -OutFile "$env:TEMP\innosetup.exe"
+          Start-Process -Wait "$env:TEMP\innosetup.exe" -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=`"$env:ProgramFiles\Inno Setup 6`""
+
+      - name: Compile Setup
+        shell: cmd
+        run: |
+          set TAG=%GITHUB_REF_NAME%
+          set VER=%TAG:v=%
+          "C:\Program Files\Inno Setup 6\ISCC.exe" setup.iss /dMyAppVersion=%VER%
 
       - name: Create Release & Upload
         uses: softprops/action-gh-release@v2
         with:
-          files: CASSIE CWC Tool（CASSIE Word Check）.zip
+          files: "CASSIE-CWC-Tool-Setup-*.exe"

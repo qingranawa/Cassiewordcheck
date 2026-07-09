@@ -50,26 +50,36 @@ public partial class Checker
             if (i > 0)
                 results.Add(new CheckResult("\n", CheckStatus.Separator));
 
+            // 预计算 <> 范围（仅在开启格式过滤时喵）
+            var bracketRanges = FilterFormatting ? FindBracketRanges(lines[i]) : null;
             var tokens = Tokenize(lines[i]);
-            foreach (var (kind, value) in tokens)
+            foreach (var (kind, value, start, end) in tokens)
             {
-                // 格式标记过滤优先喵
-                if (FilterFormatting && IsIgnoredToken(value))
+                // 格式标记过滤：<> 内全部忽略 + 标准格式标记忽略喵
+                if (FilterFormatting)
+                {
+                    if (IsIgnoredToken(value)
+                        || (bracketRanges != null && IsInRanges(start, end, bracketRanges)))
+                    {
+                        results.Add(new CheckResult(value, CheckStatus.Ignored));
+                        continue;
+                    }
+                }
+
+                // 命名过滤喵
+                if (FilterNaming && IsNamingToken(value))
                 {
                     results.Add(new CheckResult(value, CheckStatus.Ignored));
+                    continue;
                 }
-                else if (FilterNaming && IsNamingToken(value))
+
+                // 正常检查喵
+                if (kind == "word")
                 {
-                    results.Add(new CheckResult(value, CheckStatus.Ignored));
-                }
-                else if (kind == "word")
-                {
-                    // 查词库喵~
                     results.Add(CheckWord(value));
                 }
                 else
                 {
-                    // 非单词（标点、中文等）and 检查是否要忽略中文喵
                     if (IgnoreChinese && ChineseRegex().IsMatch(value))
                         results.Add(new CheckResult(value, CheckStatus.Ignored));
                     else
@@ -89,15 +99,6 @@ public partial class Checker
             return true;
 
         var lower = value.ToLowerInvariant();
-
-        // CASSIE 格式标签 <...>
-        if (value.StartsWith("<") && value.EndsWith(">"))
-        {
-            var inner = value[1..^1].ToLowerInvariant();
-            return inner == "split"
-                || inner.StartsWith("size=")
-                || inner.StartsWith("color=");
-        }
 
         // 裸词格式标记喵~
         if (lower is "link" or "split" or "color")
@@ -145,24 +146,47 @@ public partial class Checker
         return false;
     }
 
-    /// <summary>将一行文本拆分为单词和非单词 token 喵~</summary>
-    private static List<(string kind, string value)> Tokenize(string line)
+    /// <summary>将一行文本拆分为单词和非单词 token，包含位置信息喵~</summary>
+    private static List<(string kind, string value, int start, int end)> Tokenize(string line)
     {
-        var tokens = new List<(string kind, string value)>();
+        var tokens = new List<(string kind, string value, int start, int end)>();
         int pos = 0;
 
         foreach (Match m in WordRegex().Matches(line))
         {
             if (m.Index > pos)
-                tokens.Add(("other", line[pos..m.Index]));
-            tokens.Add(("word", m.Value));
+                tokens.Add(("other", line[pos..m.Index], pos, m.Index));
+            tokens.Add(("word", m.Value, m.Index, m.Index + m.Length));
             pos = m.Index + m.Length;
         }
 
         if (pos < line.Length)
-            tokens.Add(("other", line[pos..]));
+            tokens.Add(("other", line[pos..], pos, line.Length));
 
         return tokens;
+    }
+
+    /// <summary>找出行中所有 <...> 标签的起始-结束范围喵~</summary>
+    private static List<(int start, int end)> FindBracketRanges(string line)
+    {
+        var ranges = new List<(int start, int end)>();
+        foreach (Match m in BracketTagRegex().Matches(line))
+        {
+            ranges.Add((m.Index, m.Index + m.Length));
+        }
+        return ranges;
+    }
+
+    /// <summary>判断一个 token 的 [start, end) 是否落在某个范围内喵~</summary>
+    private static bool IsInRanges(int start, int end, List<(int start, int end)> ranges)
+    {
+        foreach (var (rs, re) in ranges)
+        {
+            // token 的范围和标签范围有重叠喵
+            if (start < re && end > rs)
+                return true;
+        }
+        return false;
     }
 
     /// <summary>查词库，返回可用/不可用喵~</summary>
@@ -208,6 +232,10 @@ public partial class Checker
     }
 
     // ===== 正则表达式（编译时生成，性能更好喵） =====
+
+    /// <summary>匹配 <...> 标签（含中文内容）喵~</summary>
+    [GeneratedRegex(@"<[^>]*>")]
+    private static partial Regex BracketTagRegex();
 
     /// <summary>匹配中文字符喵~</summary>
     [GeneratedRegex(@"[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]")]

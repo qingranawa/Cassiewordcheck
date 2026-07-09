@@ -1,7 +1,6 @@
 <Window x:Class="CassieWordCheck.Views.WordCountWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-       
         Title="字数统计"
         Width="600" Height="520"
         MinWidth="500" MinHeight="440"
@@ -10,223 +9,234 @@
         Background="{StaticResource BgBrush}"
         Loaded="OnWindowLoaded">
 
-    <Border Margin="1" CornerRadius="8"
-            Background="{StaticResource SurfaceBrush}"
-            BorderBrush="{StaticResource BorderBrush}"
-            BorderThickness="1">
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <Grid Margin="16,16,16,16">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+    <Grid>
+        <Ellipse Width="240" Height="240"
+                 Fill="{StaticResource AccentGradientBrush}"
+                 Opacity="0.06"
+                 HorizontalAlignment="Right"
+                 VerticalAlignment="Top"
+                 Margin="0,-60,-60,0"
+                 IsHitTestVisible="False" />
 
-                <!-- 标题 -->
-                <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,16">
-                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="17" Width="16" Height="16" VerticalAlignment="Center" TextAlignment="Center" />
-                    <TextBlock x:Name="TitleLabel"
-                               Style="{StaticResource SectionLabel}"
-                               FontSize="14" Margin="6,0,0,0" />
-                </StackPanel>
+        <Border Margin="1" CornerRadius="14"
+                Background="#0E0E12"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" Opacity="0.3" ShadowDepth="6" Direction="270" Color="#000000" />
+            </Border.Effect>
+            <Border CornerRadius="12"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
+                    Padding="0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="16,16">
+                        <!-- 标题 -->
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📝" FontSize="16" VerticalAlignment="Center" TextAlignment="Center" />
+                            <TextBlock x:Name="TitleLabel"
+                                       Style="{StaticResource SectionLabel}"
+                                       FontSize="14" Margin="6,0,0,0" />
+                        </StackPanel>
 
-                <!-- 第 1 行：字符级统计 -->
-                <WrapPanel Grid.Row="1" Margin="0,0,0,8">
-                    <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="TotalCharsLabel" Text="总字符"
-                                       FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
-                            <TextBlock Grid.Row="1" x:Name="TotalCharsVal"
-                                       Text="0" FontSize="20" FontWeight="SemiBold"
-                                       FontFamily="{StaticResource MonoFont}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-                        </Grid>
-                    </Border>
-                    <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="CharsNoSpacesLabel" Text="有效字符"
-                                       FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
-                            <TextBlock Grid.Row="1" x:Name="CharsNoSpacesVal"
-                                       Text="0" FontSize="20" FontWeight="SemiBold"
-                                       FontFamily="{StaticResource MonoFont}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-                        </Grid>
-                    </Border>
-                    <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="ChineseCharsLabel" Text="中文字符"
-                                       FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
-                            <TextBlock Grid.Row="1" x:Name="ChineseCharsVal"
-                                       Text="0" FontSize="20" FontWeight="SemiBold"
-                                       FontFamily="{StaticResource MonoFont}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-                        </Grid>
-                    </Border>
-                    <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="EnglishLettersLabel" Text="英文字母"
-                                       FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
-                            <TextBlock Grid.Row="1" x:Name="EnglishLettersVal"
-                                       Text="0" FontSize="20" FontWeight="SemiBold"
-                                       FontFamily="{StaticResource MonoFont}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-                        </Grid>
-                    </Border>
-                    <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="DigitCharsLabel" Text="数字"
-                                       FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
-                            <TextBlock Grid.Row="1" x:Name="DigitCharsVal"
-                                       Text="0" FontSize="20" FontWeight="SemiBold"
-                                       FontFamily="{StaticResource MonoFont}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-                        </Grid>
-                    </Border>
-                </WrapPanel>
+                        <!-- 字符级统计 -->
+                        <WrapPanel>
+                            <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" x:Name="TotalCharsLabel" Text="总字符"
+                                               FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
+                                    <TextBlock Grid.Row="1" x:Name="TotalCharsVal"
+                                               Text="0" FontSize="20" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </Grid>
+                            </Border>
+                            <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" x:Name="CharsNoSpacesLabel" Text="有效字符"
+                                               FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
+                                    <TextBlock Grid.Row="1" x:Name="CharsNoSpacesVal"
+                                               Text="0" FontSize="20" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </Grid>
+                            </Border>
+                            <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" x:Name="ChineseCharsLabel" Text="中文字符"
+                                               FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
+                                    <TextBlock Grid.Row="1" x:Name="ChineseCharsVal"
+                                               Text="0" FontSize="20" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </Grid>
+                            </Border>
+                            <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" x:Name="EnglishLettersLabel" Text="英文字母"
+                                               FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
+                                    <TextBlock Grid.Row="1" x:Name="EnglishLettersVal"
+                                               Text="0" FontSize="20" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </Grid>
+                            </Border>
+                            <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" x:Name="DigitCharsLabel" Text="数字"
+                                               FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
+                                    <TextBlock Grid.Row="1" x:Name="DigitCharsVal"
+                                               Text="0" FontSize="20" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </Grid>
+                            </Border>
+                        </WrapPanel>
 
-                <!-- 第 2 行：单词/行统计 -->
-                <WrapPanel Grid.Row="2" Margin="0,0,0,8">
-                    <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="TotalWordsLabel" Text="总单词"
-                                       FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
-                            <TextBlock Grid.Row="1" x:Name="TotalWordsVal"
-                                       Text="0" FontSize="20" FontWeight="SemiBold"
-                                       FontFamily="{StaticResource MonoFont}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-                        </Grid>
-                    </Border>
-                    <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="UniqueWordsLabel" Text="唯一单词"
-                                       FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
-                            <TextBlock Grid.Row="1" x:Name="UniqueWordsVal"
-                                       Text="0" FontSize="20" FontWeight="SemiBold"
-                                       FontFamily="{StaticResource MonoFont}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-                        </Grid>
-                    </Border>
-                    <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="AvgLengthLabel" Text="平均词长"
-                                       FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
-                            <TextBlock Grid.Row="1" x:Name="AvgLengthVal"
-                                       Text="0" FontSize="20" FontWeight="SemiBold"
-                                       FontFamily="{StaticResource MonoFont}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-                        </Grid>
-                    </Border>
-                    <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="TotalLinesLabel" Text="总行数"
-                                       FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
-                            <TextBlock Grid.Row="1" x:Name="TotalLinesVal"
-                                       Text="0" FontSize="20" FontWeight="SemiBold"
-                                       FontFamily="{StaticResource MonoFont}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-                        </Grid>
-                    </Border>
-                    <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" x:Name="NonEmptyLinesLabel" Text="非空行"
-                                       FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
-                            <TextBlock Grid.Row="1" x:Name="NonEmptyLinesVal"
-                                       Text="0" FontSize="20" FontWeight="SemiBold"
-                                       FontFamily="{StaticResource MonoFont}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" />
-                        </Grid>
-                    </Border>
-                </WrapPanel>
+                        <!-- 单词/行统计 -->
+                        <WrapPanel>
+                            <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" x:Name="TotalWordsLabel" Text="总单词"
+                                               FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
+                                    <TextBlock Grid.Row="1" x:Name="TotalWordsVal"
+                                               Text="0" FontSize="20" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </Grid>
+                            </Border>
+                            <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" x:Name="UniqueWordsLabel" Text="唯一单词"
+                                               FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
+                                    <TextBlock Grid.Row="1" x:Name="UniqueWordsVal"
+                                               Text="0" FontSize="20" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </Grid>
+                            </Border>
+                            <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" x:Name="AvgLengthLabel" Text="平均词长"
+                                               FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
+                                    <TextBlock Grid.Row="1" x:Name="AvgLengthVal"
+                                               Text="0" FontSize="20" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </Grid>
+                            </Border>
+                            <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" x:Name="TotalLinesLabel" Text="总行数"
+                                               FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
+                                    <TextBlock Grid.Row="1" x:Name="TotalLinesVal"
+                                               Text="0" FontSize="20" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </Grid>
+                            </Border>
+                            <Border CornerRadius="8" Background="#1A1A2E" Padding="14,10" Margin="0,0,8,8" MinWidth="90">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" x:Name="NonEmptyLinesLabel" Text="非空行"
+                                               FontSize="10" Foreground="{StaticResource TextMutedBrush}" />
+                                    <TextBlock Grid.Row="1" x:Name="NonEmptyLinesVal"
+                                               Text="0" FontSize="20" FontWeight="SemiBold"
+                                               FontFamily="{StaticResource MonoFont}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" />
+                                </Grid>
+                            </Border>
+                        </WrapPanel>
 
-                <!-- 词频分布 Top 12 -->
-                <Border Grid.Row="3" CornerRadius="8"
-                        Background="{StaticResource BgBrush}"
-                        BorderBrush="{StaticResource BorderBrush}"
-                        BorderThickness="1"
-                        Padding="12,10" Margin="0,0,0,8">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <TextBlock x:Name="FreqLabel" Text="词频分布 Top 12"
-                                   FontSize="12" FontWeight="SemiBold"
-                                   Foreground="{StaticResource AccentLightBrush}"
-                                   Margin="0,0,0,8" />
-                        <Canvas x:Name="FreqCanvas" Grid.Row="1"
-                                MinHeight="200" />
-                        <TextBlock x:Name="FreqEmptyLabel" Grid.Row="1"
-                                   Text="暂无数据"
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="13"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Visibility="Collapsed" />
-                    </Grid>
-                </Border>
+                        <!-- 词频分布 Top 12 -->
+                        <Border CornerRadius="8"
+                                Background="{StaticResource BgBrush}"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="1"
+                                Padding="12,10">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <TextBlock x:Name="FreqLabel" Text="词频分布 Top 12"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource AccentLightBrush}"
+                                           Margin="0,0,0,8" />
+                                <Canvas x:Name="FreqCanvas" Grid.Row="1"
+                                        MinHeight="200" />
+                                <TextBlock x:Name="FreqEmptyLabel" Grid.Row="1"
+                                           Text="暂无数据"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           FontSize="13"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Visibility="Collapsed" />
+                            </Grid>
+                        </Border>
 
-                <!-- 词长分布 -->
-                <Border Grid.Row="4" CornerRadius="8"
-                        Background="{StaticResource BgBrush}"
-                        BorderBrush="{StaticResource BorderBrush}"
-                        BorderThickness="1"
-                        Padding="12,10">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <TextBlock x:Name="LengthLabel" Text="词长分布"
-                                   FontSize="12" FontWeight="SemiBold"
-                                   Foreground="{StaticResource AccentLightBrush}"
-                                   Margin="0,0,0,8" />
-                        <Canvas x:Name="LengthCanvas" Grid.Row="1"
-                                MinHeight="80" />
-                    </Grid>
-                </Border>
-            </Grid>
-        </ScrollViewer>
-    </Border>
+                        <!-- 词长分布 -->
+                        <Border CornerRadius="8"
+                                Background="{StaticResource BgBrush}"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="1"
+                                Padding="12,10">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <TextBlock x:Name="LengthLabel" Text="词长分布"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource AccentLightBrush}"
+                                           Margin="0,0,0,8" />
+                                <Canvas x:Name="LengthCanvas" Grid.Row="1"
+                                        MinHeight="80" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Border>
+    </Grid>
 </Window>

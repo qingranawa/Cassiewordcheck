@@ -155,13 +155,16 @@ public partial class MainWindow : Window
     {
         try
         {
-            var paths = new[]
+            var baseDirs = new[]
             {
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "AAA.JPG"),
-                Path.Combine(Path.GetDirectoryName(Environment.ProcessPath) ?? ".", "data", "AAA.JPG"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "AAA.ico"),
-                Path.Combine(Path.GetDirectoryName(Environment.ProcessPath) ?? ".", "data", "AAA.ico"),
+                AppDomain.CurrentDomain.BaseDirectory,
+                Path.GetDirectoryName(Environment.ProcessPath) ?? ".",
+                Directory.GetCurrentDirectory(),
             };
+            var names = new[] { "AAA.JPG", "AAA.ico", "AAA.png", "app.ico" };
+            var paths = baseDirs
+                .SelectMany(dir => names.Select(name => Path.Combine(dir, "data", name)))
+                .ToArray();
             var imgPath = paths.FirstOrDefault(File.Exists);
             if (imgPath is not null)
             {
@@ -179,13 +182,15 @@ public partial class MainWindow : Window
                     bitmap.BeginInit();
                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
                     using (var stream = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                    {
                         bitmap.StreamSource = stream;
-                    bitmap.EndInit();
+                        bitmap.EndInit();
+                    }
                     ToolbarIcon.Source = bitmap;
                 }
             }
         }
-        catch { /* 静默 */ }
+        catch { /* 图标加载失败时保持 Ellipse 后备色块 */ }
     }
 
     // ── 输入变化（防抖：80ms 内连续输入只触发一次）──────────────
@@ -252,11 +257,11 @@ public partial class MainWindow : Window
         _snapshotIgnored = ignored;
         _snapshotCoverage = coverage;
 
-        // 进度条过渡（按父容器宽度比例计算）
-        var parentWidth = ((FrameworkElement)CoverageBar.Parent).ActualWidth;
-        var targetWidth = Math.Max(2, parentWidth * coverage / 100.0);
+        // 进度条过渡（固定最大宽度 242 = 300 - 固定 50px 百分比列 - 间距 8）
+        var maxBarWidth = 242.0;
+        var targetWidth = Math.Max(2, maxBarWidth * coverage / 100.0);
         Animate(CoverageBar, FrameworkElement.WidthProperty,
-            CoverageBar.ActualWidth, targetWidth, 400, new QuadraticEase());
+            CoverageBar.ActualWidth, targetWidth, 400, new QuadraticEase { EasingMode = EasingMode.EaseOut });
 
         // 结果卡片轻微反馈（仅前 5 次触发，避免反复缩放导致闪烁）
         if (_bounceCount < 5)
@@ -842,23 +847,45 @@ public partial class MainWindow : Window
     // ── 打开设置 ──────────────────────────────────────────────────
     private void OnOpenSettings(object sender, RoutedEventArgs e)
     {
-        var dialog = new SettingsWindow(_settings, _checker, _wordlist, _localization);
-        dialog.Owner = this;
-        if (dialog.ShowDialog() == true)
+        try
         {
-            InputBox.FontSize = _settings.FontSize;
-            InputBox.TextWrapping = _settings.WordWrap ? TextWrapping.Wrap : TextWrapping.NoWrap;
-            ResultBox.FontSize = _settings.FontSize;
-            UpdateUILanguage();
-            UpdateResult();
+            var dialog = new SettingsWindow(_settings, _checker, _wordlist, _localization);
+            dialog.Owner = this;
+            if (dialog.ShowDialog() == true)
+            {
+                InputBox.FontSize = _settings.FontSize;
+                InputBox.TextWrapping = _settings.WordWrap ? TextWrapping.Wrap : TextWrapping.NoWrap;
+                ResultBox.FontSize = _settings.FontSize;
+                UpdateUILanguage();
+                UpdateResult();
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"打开设置窗口时出错了。\n{ex.Message}",
+                "CASSIE CWC Tool",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
         }
     }
 
     private void OnOpenAbout(object sender, RoutedEventArgs e)
     {
-        var dialog = new AboutWindow();
-        dialog.Owner = this;
-        dialog.ShowDialog();
+        try
+        {
+            var dialog = new AboutWindow();
+            dialog.Owner = this;
+            dialog.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"打开关于窗口时出错了。\n{ex.Message}",
+                "CASSIE CWC Tool",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
     }
 
     // ── 字数统计 ──────────────────────────────────────────
