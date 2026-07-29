@@ -1,3 +1,4 @@
+using System.IO;
 using CassieWordCheck.Models;
 
 namespace CassieWordCheck.Tests;
