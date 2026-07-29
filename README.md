@@ -21,7 +21,7 @@
 | 📊 **实时统计** | 可用数、不可用数、忽略数、覆盖率一目了然，进度条可视化 |
 | 💡 **拼写建议** | 对不可用词自动 Levenshtein 相似词推荐 |
 | 📋 **白名单管理** | 添加自定义豁免词，支持导入/导出 |
-| 🌐 **多语言界面** | 简体中文 / English / 日本語 / 한국어 / Deutsch / Русский / Français |
+| 🌐 **多语言界面** | 简体中文 / English / 日本語 / 한국어 / Deutsch / Русский / Français / ไทย |
 | 🔍 **格式过滤** | 自动忽略 link、color、size、split 等 CASSIE 格式标记 |
 | 🏷️ **命名过滤** | 屏蔽 MTF/UIU/GOC 等阵营缩写及北约代号、希腊字母 |
 | 🌙 **暗色主题** | Mica 毛玻璃效果，全组件平滑动画 |
@@ -41,7 +41,7 @@
 
 ### 方法一：下载 Release（推荐）
 
-前往 [Releases 页面](https://github.com/qingranawa/Cassiewordcheck/releases) 下载最新版本的 `CASSIE CWC Tool（CASSIE Word Check）.zip`，压缩后运行 `CassieWordCheck.exe` 即可。
+前往 [Releases 页面](https://github.com/qingranawa/Cassiewordcheck/releases) 下载最新版本的 `CASSIE-CWC-Tool-Setup-x.y.z.exe`，安装后即可从开始菜单或桌面快捷方式启动。
 
 ### 方法二：自行构建
 
@@ -54,11 +54,11 @@ cd CassieWordCheck
 dotnet restore
 dotnet build -c Release
 
-# 单文件发布（输出到 dist/）
+# 自包含文件夹发布（输出到 dist/）
 dotnet publish -c Release -r win-x64 -o dist --self-contained true
 ```
 
-或直接双击项目根目录的 `publish.bat`。
+如需生成安装包，请在 Windows 上安装 Inno Setup 6 后编译 `setup.iss`；日常本地打包也可以直接双击项目根目录的 `publish.bat`。
 
 ## 🎮 使用方式
 
@@ -87,7 +87,7 @@ CassieWordCheck/
 │
 ├── Resources/
 │   ├── Styles.xaml          全局暗色主题样式
-│   ├── Locales/             多语言翻译 JSON（7 种语言）
+│   ├── Locales/             多语言翻译 JSON（8 种语言）
 │   └── Services/
 │       ├── DocumentBuilder.cs   结果 → 富文本 FlowDocument
 │       ├── MarkdownConverter.cs Markdown → FlowDocument 渲染
@@ -104,16 +104,21 @@ CassieWordCheck/
 │   ├── WhitelistWindow      白名单管理
 │   └── AboutWindow          关于（功能/更新日志/关于/声明）
 │
-├── data/                    运行时数据
+├── data/                    随程序发布的只读词库和图片
 │   ├── cassie-text.txt      CASSIE 配音词库
 │   ├── AAA.ico              应用图标
 │   ├── AAA.JPG              工具栏图标
 │   └── qr.JPG               头像
 │
+├── Directory.Build.props    统一版本来源
 ├── publish.bat              一键构建脚本
-├── .github/workflows/       GitHub Actions 自动发布
+├── setup.iss                Inno Setup 安装包脚本
+├── .github/workflows/       CI 与 GitHub Actions 自动发布
+├── CassieWordCheck.Tests/   xUnit 回归测试
 └── dist/                    构建输出
 ```
+
+用户设置和检查历史不会写入安装目录，而是保存在 `%LOCALAPPDATA%\CassieWordCheck`。首次升级时会从旧版本安装目录的 `data` 文件夹自动迁移已有 JSON 文件，且不会覆盖已经存在的新数据。
 
 ## 🔧 技术栈
 

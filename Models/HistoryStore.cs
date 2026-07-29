@@ -8,7 +8,7 @@ namespace CassieWordCheck.Models;
 /// </summary>
 public class HistoryStore
 {
-    // 历史记录存哪儿：exe 同目录的 data/history.json 喵~
+    // 历史记录存放在 LocalAppData，避免安装目录不可写。
     private readonly string _filePath;
     private readonly List<HistoryItem> _items = [];
 
@@ -19,15 +19,9 @@ public class HistoryStore
     /// <param name="filePath">可自定义路径，不传则用默认喵~</param>
     public HistoryStore(string? filePath = null)
     {
-        _filePath = filePath ?? Path.Combine(
-            GetAppDir(), "data", "history.json");
+        _filePath = filePath ?? AppDataPaths.GetUserFilePath("history.json");
         Load(); // 启动时加载已保存的历史喵~
     }
-
-    // 获取 exe 真实目录（单文件发布时不会指向临时解压目录喵）
-    private static string GetAppDir() =>
-        Path.GetDirectoryName(Environment.ProcessPath)
-        ?? AppDomain.CurrentDomain.BaseDirectory;
 
     /// <summary>添加一条检查记录，自动去重+保存喵~</summary>
     public void Add(string inputText, string resultText,
@@ -83,6 +77,9 @@ public class HistoryStore
         try
         {
             var json = JsonSerializer.Serialize(_items, new JsonSerializerOptions { WriteIndented = true });
+            var directory = Path.GetDirectoryName(_filePath);
+            if (!string.IsNullOrWhiteSpace(directory))
+                Directory.CreateDirectory(directory);
             File.WriteAllText(_filePath, json);
         }
         catch { /* 写入失败时静默忽略喵~ */ }

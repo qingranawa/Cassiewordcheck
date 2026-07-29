@@ -109,5 +109,18 @@
   "wordcount.avg_length": "Avg Length",
   "wordcount.total_lines": "Total Lines",
   "wordcount.nonempty_lines": "Non-Empty Lines",
-  "replace.find": "Find"
+  "replace.find": "Find",
+  "app.single_instance": "The application is already running.",
+  "label.default": "Default",
+  "menu.copy_result": "Copy Result",
+  "replace.to": "Replace with",
+  "replace.replace": "Replace",
+  "replace.label": "Replace \"{0}\" with:",
+  "result.available": "Available",
+  "result.coverage": "Coverage",
+  "result.ignored": "Ignored",
+  "result.total": "Total Words",
+  "result.unavailable": "Unavailable",
+  "settings.font_size": "Font Size",
+  "settings.word_wrap": "Word Wrap"
 }

@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace CassieWordCheck.Models;
 
 /// <summary>
-/// 应用设置——自动读写 data/appsettings.json，保存用户的偏好喵~
+/// 应用设置——自动读写 LocalAppData 中的用户偏好。
 /// </summary>
 public class Settings
 {
@@ -30,16 +30,9 @@ public class Settings
     /// <param name="filePath">可自定义路径，不传则用默认喵~</param>
     public Settings(string? filePath = null)
     {
-        _filePath = filePath ?? Path.Combine(
-            GetAppDir(),
-            "data", "appsettings.json");
+        _filePath = filePath ?? AppDataPaths.GetUserFilePath("appsettings.json");
         Load(); // 构造时自动加载已保存的配置喵！
     }
-
-    // 获取 exe 真实目录喵~
-    private static string GetAppDir() =>
-        Path.GetDirectoryName(Environment.ProcessPath)
-        ?? AppDomain.CurrentDomain.BaseDirectory;
 
     /// <summary>从 JSON 文件加载配置喵~</summary>
     public void Load()
@@ -87,6 +80,9 @@ public class Settings
                 ResultMode = ResultMode,
             };
             var json = JsonSerializer.Serialize(data, JsonOptions);
+            var directory = Path.GetDirectoryName(_filePath);
+            if (!string.IsNullOrWhiteSpace(directory))
+                Directory.CreateDirectory(directory);
             File.WriteAllText(_filePath, json);
         }
         catch

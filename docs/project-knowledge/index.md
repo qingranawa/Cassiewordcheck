@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-28
+last_updated: 2026-07-29
 updated_by: superpowers-memory:rebuild
 covers_branch: main@fdeceab
 ---
@@ -13,10 +13,10 @@ covers_branch: main@fdeceab
   关键点：自包含发布，仅限 Windows，JSON 持久化
 
 - [features.md](features.md) — 10 项已实现功能，分 4 个组
-  关键点：实时词库检查、Levenshtein 拼写建议、白名单、多语言（7 种语言）、历史记录、统计
+  关键点：实时词库检查、Levenshtein 拼写建议、白名单、多语言（8 种语言）、历史记录、统计
 
-- [conventions.md](conventions.md) — PascalCase 命名、启用可为空引用、静默错误恢复
-  关键点：无 DI 容器、Models 不得引用 UI、FrozenSet 加载后不可变
+- [conventions.md](conventions.md) — PascalCase 命名、启用可为空引用、边界错误恢复
+  关键点：无 DI 容器、Models 不得引用 UI、FrozenSet 加载后不可变、xUnit 与 CI 资源校验
 
 - [decisions.md](decisions.md) — 3 个 ADR
   关键点：选 WPF 因为 FlowDocument + 动画；FrozenSet 实现 O(1) 查询；小数据量选 JSON 而非 SQLite

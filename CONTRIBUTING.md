@@ -55,7 +55,7 @@ dotnet build
 
 ### 本地一键打包
 
-项目根目录的 `publish.bat` 用于快速生成单文件发布包：
+项目根目录的 `publish.bat` 用于快速生成 Windows 自包含文件夹发布包：
 
 ```bat
 :: 直接双击运行，输出到 dist/ 目录
@@ -67,7 +67,7 @@ publish.bat
 1. 清理旧的 `dist/` 目录
 2. `dotnet restore` 恢复依赖
 3. `dotnet build -c Release` 编译发布配置
-4. `dotnet publish -c Release -r win-x64 -o dist` 生成单文件
+4. `dotnet publish -c Release -r win-x64 -o dist` 生成自包含发布目录
 5. 删除多余的 `.pdb` 文件
 6. 显示最终的 dist 目录结构
 
@@ -75,14 +75,14 @@ publish.bat
 
 ```
 dist/
-├── CassieWordCheck.exe    单文件可执行程序
-├── data/                  运行时数据（词库/图标/配置）
+├── CassieWordCheck.exe    应用程序
+├── data/                  随程序发布的只读资源（词库/图标）
 │   ├── cassie-text.txt
 │   ├── AAA.ico / AAA.JPG / qr.JPG
-│   ├── appsettings.json   （运行时生成）
-│   └── history.json        （运行时生成）
 └── Resources/Locales/     多语言文件
 ```
+
+用户设置和历史记录保存在 `%LOCALAPPDATA%\CassieWordCheck`，不会写入安装目录。
 
 ## 🔧 代码规范
 
@@ -145,7 +145,7 @@ perf: 减少同时并发动画数
 
 ## 🚀 发版流程
 
-1. 更新 `CassieWordCheck.csproj` 中的 `<Version>` 和 `<FileVersion>`
+1. 更新 `Directory.Build.props` 中的 `VersionPrefix`、`AssemblyVersion` 和 `FileVersion`
 2. 更新 `Views/AboutWindow.xaml.cs` 中的更新日志 `ChangelogText`
 3. 确认所有 locale JSON 文件已更新
 4. 提交代码并推送至 `main` 分支
@@ -158,20 +158,24 @@ git push origin v2.3.0
 
 GitHub Actions 会自动编译、打包并上传到 Releases 页面。
 
+每次 Push 和 Pull Request 还会自动执行构建、xUnit 测试以及词库/本地化资源完整性检查。
+
 ## 📁 项目结构说明
 
 - `Models/` — 纯数据模型和业务逻辑，不依赖 WPF
 - `Views/` — WPF 窗口，UI 逻辑分离
 - `Resources/Services/` — UI 相关的服务类
 - `Resources/Locales/` — 多语言 JSON，新增语言时添加文件即可
-- `data/` — 运行时数据和静态资源
+- `data/` — 随程序发布的只读词库和静态资源
+- `%LOCALAPPDATA%\CassieWordCheck` — 用户设置与检查历史
 
 ## ✅ Pull Request 检查清单
 
 - [ ] 代码编译通过
 - [ ] 遵循命名规范
 - [ ] 新增功能已添加本地化翻译 key
-- [ ] 已测试（如适用）
+- [ ] `dotnet test` 通过
+- [ ] 词库和所有本地化 JSON 完整性检查通过
 - [ ] Commit 信息清晰
 
 ---

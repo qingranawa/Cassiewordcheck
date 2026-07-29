@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-28
+last_updated: 2026-07-29
 updated_by: superpowers-memory:rebuild
 triggered_by_plan: null
 ---
@@ -37,8 +37,10 @@ triggered_by_plan: null
 
 ## 配置
 
-**运行时：** `data/appsettings.json` —— 自动创建的 JSON，保存用户偏好（过滤器、语言、主题、字体、白名单路径）
-**构建：** `CassieWordCheck.csproj` —— Release 单文件发布，Debug 可移植调试
+**版本：** `Directory.Build.props` —— 统一维护 `VersionPrefix`、`AssemblyVersion` 和 `FileVersion`
+**运行时：** `%LOCALAPPDATA%\CassieWordCheck\appsettings.json` 与 `history.json` —— 自动创建的 JSON，保存用户偏好和检查历史；首次启动迁移旧安装目录中的同名文件
+**构建：** `CassieWordCheck.csproj` —— Release win-x64 自包含文件夹发布，Inno Setup 生成安装包
+**校验：** `CassieWordCheck.Tests` —— xUnit 回归测试与词库/本地化资源完整性检查
 
 ## 平台要求
 

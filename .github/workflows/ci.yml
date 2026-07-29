@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore CassieWordCheck.sln
+
+      - name: Build
+        run: dotnet build CassieWordCheck.sln --configuration Release --no-restore --verbosity minimal
+
+      - name: Test
+        run: dotnet test CassieWordCheck.Tests/CassieWordCheck.Tests.csproj --configuration Release --no-build --no-restore --verbosity normal

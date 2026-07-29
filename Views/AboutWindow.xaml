@@ -121,12 +121,12 @@
                                         Margin="10,0,0,0"
                                         VerticalAlignment="Center">
                                     <TextBlock x:Name="VersionBadge"
-                                               Text="v2.3.6"
+                                               Text="v2.4.4"
                                                FontSize="9" FontWeight="SemiBold"
                                                Foreground="{StaticResource ErrorBrush}" />
                                 </Border>
                             </StackPanel>
-                            <TextBlock x:Name="VersionLabel" Text="版本 2.3.6"
+                            <TextBlock x:Name="VersionLabel" Text="版本 2.4.4"
                                        FontSize="11"
                                        Foreground="{StaticResource TextSecondaryBrush}"
                                        Margin="0,2,0,0" />

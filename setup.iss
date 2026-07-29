@@ -6,9 +6,9 @@
 #define MyAppURL "https://github.com/qingranawa/Cassiewordcheck"
 #define MyAppExeName "CassieWordCheck.exe"
 
-; 版本号从命令行传入（/dMyAppVersion=x.y.z），默认 2.4.3
+; 版本号从命令行传入（/dMyAppVersion=x.y.z），默认 2.4.4
 #ifndef MyAppVersion
-  #define MyAppVersion "2.4.3"
+  #define MyAppVersion "2.4.4"
 #endif
 
 [Setup]

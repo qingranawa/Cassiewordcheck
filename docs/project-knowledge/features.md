@@ -36,13 +36,13 @@ triggered_by_plan: null
 
 **角色 / 入口** —— 最终用户 → `WhitelistWindow`（从工具栏 ⊞ 按钮打开）
 
-**边界** —— 白名单持久化在 `data/appsettings.json` 中。支持添加、移除、清空和从文件批量导入。大小写不敏感匹配。
+**边界** —— 白名单持久化在 `%LOCALAPPDATA%\CassieWordCheck\appsettings.json` 中。旧版本的 `data/appsettings.json` 会在首次启动时迁移。支持添加、移除、清空和从文件批量导入。大小写不敏感匹配。
 
 **参考** —— `Views/WhitelistWindow.xaml.cs`，`Models/WordList.cs` §白名单
 
 #### 多语言界面
 
-**功能** —— 应用界面可在 7 种语言间切换：简体中文、English、日本語、한국어、Deutsch、Русский、Français。
+**功能** —— 应用界面可在 8 种语言间切换：简体中文、English、日本語、한국어、Deutsch、Русский、Français、ไทย。
 
 **角色 / 入口** —— 最终用户 → `SettingsWindow` 语言下拉框
 
@@ -78,7 +78,7 @@ triggered_by_plan: null
 
 **角色 / 入口** —— 最终用户 → `HistoryWindow`（从工具栏时钟按钮打开）
 
-**边界** —— 去重：连续相同的输入文本不会重复存储。历史持久化到 `data/history.json`。点击历史条目可恢复输入文本。
+**边界** —— 去重：连续相同的输入文本不会重复存储。历史持久化到 `%LOCALAPPDATA%\CassieWordCheck\history.json`。点击历史条目可恢复输入文本。
 
 **参考** —— `Models/HistoryStore.cs`，`Views/HistoryWindow.xaml.cs`
 
@@ -116,13 +116,19 @@ triggered_by_plan: null
 
 ### 运维
 
-#### 单文件发布
+#### 自包含文件夹发布与安装包
 
-**功能** —— 应用可通过 `dotnet publish -c Release` 发布为单个 `.exe`，打包 .NET 运行时和所有依赖。
+**功能** —— 应用通过 `dotnet publish -c Release -r win-x64 --self-contained true` 生成包含 .NET 运行时的发布目录，并通过 Inno Setup 生成安装包。
 
 **角色 / 入口** —— 开发者 → `publish.bat` 或 `dotnet publish` 命令
 
-**边界** —— 输出到 `dist/` 目录。Release 为自包含；Debug 为依赖框架。
+**边界** —— 输出到 `dist/` 目录。用户可写设置和历史不随发布目录分发。
+
+#### 词库与本地化完整性检查
+
+**功能** —— xUnit 测试会检查内置词库存在且可解析，并检查所有 locale JSON 的格式、非空翻译、语言自描述 key 和业务 key 一致性。
+
+**角色 / 入口** —— 开发者 → `dotnet test` 或 GitHub Actions CI
 
 **参考** —— `CassieWordCheck.csproj` §Release 配置
 

@@ -118,5 +118,9 @@
   "wordcount.avg_length": "平均词长",
   "wordcount.total_lines": "总行数",
   "wordcount.nonempty_lines": "非空行",
-  "replace.find": "查找"
+  "replace.find": "查找",
+  "app.single_instance": "程序已在运行中。",
+  "label.default": "默认",
+  "settings.font_size": "字体大小",
+  "settings.word_wrap": "自动换行"
 }

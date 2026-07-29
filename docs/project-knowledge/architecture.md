@@ -13,7 +13,7 @@ triggered_by_plan: null
 **关键特征：**
 - 单体 WPF 桌面应用；所有组件在同一程序集中，通过直接方法调用通信
 - 文本处理流水线：分词 → 过滤 → 查词 → 渲染，由实时输入驱动
-- JSON 持久化配置和历史；词库使用 FrozenSet 实现 O(1) 查询
+- JSON 持久化配置和历史；词库使用 FrozenSet 实现 O(1) 查询；用户可写数据与安装目录分离
 
 ## 系统上下文
 
@@ -37,7 +37,7 @@ triggered_by_plan: null
 - `MainWindow` —— 主界面（输入/结果/统计/建议）；`SettingsWindow` —— 设置；`StatisticsWindow` —— 趋势图表；`HistoryWindow` —— 检查历史；`WhitelistWindow` —— 白名单管理；`AboutWindow` —— 关于页面
 
 **Resources** —— 静态资源。`Resources/`
-- `Styles.xaml` —— 全局暗色主题；`Locales/*.json` —— 多语言翻译（7 种语言）
+- `Styles.xaml` —— 全局暗色主题；`Locales/*.json` —— 多语言翻译（8 种语言）；`ProjectIntegrityValidator` —— 发布资源完整性检查
 
 **调用方向规则：**
 - Views → Models（直接实例化/构造函数注入）

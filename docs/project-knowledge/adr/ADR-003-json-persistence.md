@@ -13,7 +13,7 @@ status: Accepted
 
 ## 决策
 
-使用 `System.Text.Json` 以 JSON 文件做持久化（`data/appsettings.json` 和 `data/history.json`）。无外部数据库依赖。
+使用 `System.Text.Json` 以 JSON 文件做持久化（`%LOCALAPPDATA%\CassieWordCheck\appsettings.json` 和 `history.json`）。无外部数据库依赖。旧版本安装目录中的同名文件只在目标不存在时迁移。
 
 ## 被拒绝的替代方案
 

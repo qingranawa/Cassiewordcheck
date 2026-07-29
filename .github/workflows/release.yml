@@ -19,8 +19,19 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Validate release tag
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF_NAME -notmatch '^v(\d+\.\d+\.\d+)$') {
+            throw "Release tags must use the vX.Y.Z format. Got: $env:GITHUB_REF_NAME"
+          }
+          "RELEASE_VERSION=$($Matches[1])" >> $env:GITHUB_ENV
+
+      - name: Test
+        run: dotnet test CassieWordCheck.Tests/CassieWordCheck.Tests.csproj --configuration Release --verbosity normal
+
       - name: Build & Publish to dist
-        run: dotnet publish CassieWordCheck.csproj -c Release -r win-x64 -o dist --verbosity quiet
+        run: dotnet publish CassieWordCheck.csproj -c Release -r win-x64 -o dist --self-contained true "-p:Version=${env:RELEASE_VERSION}" "-p:AssemblyVersion=${env:RELEASE_VERSION}.0" "-p:FileVersion=${env:RELEASE_VERSION}.0" --verbosity quiet
 
       - name: Clean debug symbols
         run: Remove-Item "dist/*.pdb" -ErrorAction SilentlyContinue
@@ -34,8 +45,7 @@ jobs:
         shell: cmd
         run: |
           set TAG=%GITHUB_REF_NAME%
-          set VER=%TAG:v=%
-          "C:\Program Files\Inno Setup 6\ISCC.exe" setup.iss /dMyAppVersion=%VER%
+          "C:\Program Files\Inno Setup 6\ISCC.exe" setup.iss /dMyAppVersion=%RELEASE_VERSION%
 
       - name: Create Release & Upload
         uses: softprops/action-gh-release@v2

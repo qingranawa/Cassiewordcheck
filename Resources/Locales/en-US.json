@@ -118,5 +118,9 @@
   "wordcount.avg_length": "Avg Length",
   "wordcount.total_lines": "Total Lines",
   "wordcount.nonempty_lines": "Non-Empty Lines",
-  "replace.find": "Find"
+  "replace.find": "Find",
+  "app.single_instance": "The application is already running.",
+  "label.default": "Default",
+  "settings.font_size": "Font Size",
+  "settings.word_wrap": "Word Wrap"
 }

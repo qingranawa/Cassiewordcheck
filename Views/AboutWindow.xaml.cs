@@ -23,7 +23,7 @@ public partial class AboutWindow : Window
 - **实时统计** — 可用数、不可用数、忽略数、覆盖率一目了然
 - **拼写建议** — 对不可用词自动 `Levenshtein` 相似词推荐
 - **白名单管理** — 添加自定义豁免词，支持导入/导出
-- **多语言界面** — 简体中文 / English / 日本語 / 한국어 / Deutsch / Русский / Français
+- **多语言界面** — 简体中文 / English / 日本語 / 한국어 / Deutsch / Русский / Français / ไทย
 
 ### 过滤系统
 
@@ -36,7 +36,7 @@ public partial class AboutWindow : Window
 - **暗色深色主题** + Mica 毛玻璃效果（Windows 11）
 - **全组件平滑动画**（卡片弹入/按钮缩放/进度条过渡/逐字清空）
 - **实时键入响应** — 输入即检查，结果框同步动画反馈
-- **单文件自包含发布** — 无需安装 .NET 运行时
+- **自包含安装包** — 安装包内置 .NET 运行时，无需单独安装运行时
 
 ---
 ";
@@ -88,6 +88,15 @@ Awni、虚无
 
     private const string ChangelogText = @"
 # 更新日志
+
+## `v2.4.4`（2026-07-29）— 版本统一 · AppData 数据迁移 · CI 与资源完整性检查
+
+### 稳定性与发布
+- **统一版本来源** — 版本元数据集中到 `Directory.Build.props`，关于页和自动更新读取程序集版本，避免版本号漂移
+- **迁移用户数据目录** — 设置和检查历史改存 `%LOCALAPPDATA%\CassieWordCheck`，首次启动会安全迁移旧安装目录中的 JSON 文件，不覆盖已有数据
+- **CI 自动验证** — Push 和 Pull Request 自动执行 Windows build/test；Release 也会校验 tag 版本并执行测试
+- **词库与本地化完整性检查** — 自动检查内置词库和所有 locale JSON，缺失翻译或格式错误会阻止 CI 通过
+- **发布配置同步** — 修正自包含文件夹发布、安装包版本和相关文档描述
 
 ## `v2.4.3`（2026-07-09）— <> 标签全面忽略 · Inno Setup 6 安装包 · CI/CD 自动发行
 ### 功能调整

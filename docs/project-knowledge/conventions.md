@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-28
+last_updated: 2026-07-29
 updated_by: superpowers-memory:rebuild
 triggered_by_plan: null
 ---
@@ -40,8 +40,9 @@ triggered_by_plan: null
 
 ## 测试约定
 
-**测试框架：** 当前未配置（未检测到测试项目）
-**Mock 原则：** 不适用
+**测试框架：** xUnit，测试项目为 `CassieWordCheck.Tests/`
+**Mock 原则：** 优先测试真实文件和真实业务对象；只有外部网络或不可控系统边界才使用 mock
+**资源检查：** `ProjectIntegrityValidatorTests` 验证内置词库和所有本地化 JSON；CI 在 Push/PR 时运行完整测试
 
 ## Git 与工作流
 

@@ -8,8 +8,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>data\AAA.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>2.4.2.0</Version>
-    <FileVersion>2.4.2.0</FileVersion>
     <AssemblyName>CassieWordCheck</AssemblyName>
     <RootNamespace>CassieWordCheck</RootNamespace>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
@@ -54,6 +52,7 @@
     </Content>
     <Content Include="Resources\Locales\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="data\AAA.JPG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
