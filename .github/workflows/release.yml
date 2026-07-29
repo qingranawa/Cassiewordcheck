@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing or new release tag, for example v2.4.4"
+        required: true
+        default: "v2.4.4"
+        type: string
 
 permissions:
   contents: write
@@ -21,10 +28,19 @@ jobs:
 
       - name: Validate release tag
         shell: pwsh
+        env:
+          RELEASE_TAG_INPUT: ${{ inputs.release_tag }}
         run: |
-          if ($env:GITHUB_REF_NAME -notmatch '^v(\d+\.\d+\.\d+)$') {
-            throw "Release tags must use the vX.Y.Z format. Got: $env:GITHUB_REF_NAME"
+          $releaseTag = if ([string]::IsNullOrWhiteSpace($env:RELEASE_TAG_INPUT)) {
+            $env:GITHUB_REF_NAME
+          } else {
+            $env:RELEASE_TAG_INPUT
           }
+
+          if ($releaseTag -notmatch '^v(\d+\.\d+\.\d+)$') {
+            throw "Release tags must use the vX.Y.Z format. Got: $releaseTag"
+          }
+          "RELEASE_TAG=$releaseTag" >> $env:GITHUB_ENV
           "RELEASE_VERSION=$($Matches[1])" >> $env:GITHUB_ENV
 
       - name: Test
@@ -37,17 +53,52 @@ jobs:
         run: Remove-Item "dist/*.pdb" -ErrorAction SilentlyContinue
 
       - name: Install Inno Setup 6
+        shell: pwsh
+        env:
+          INNO_SETUP_VERSION: 6.5.0
+          INNO_SETUP_SHA256: 79b7a1063b3888bb8eceb44a8c28e90ccdaa22ac71f9272de1dac79b42941dbd
         run: |
-          iwr -useb "https://jrsoftware.org/download.php/is.exe" -OutFile "$env:TEMP\innosetup.exe"
-          Start-Process -Wait "$env:TEMP\innosetup.exe" -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR=`"$env:ProgramFiles\Inno Setup 6`""
+          $installer = Join-Path $env:TEMP "innosetup-$env:INNO_SETUP_VERSION.exe"
+          $downloadUrl = "https://github.com/jrsoftware/issrc/releases/download/is-6_5_0/innosetup-$env:INNO_SETUP_VERSION.exe"
+          Invoke-WebRequest -Uri $downloadUrl -OutFile $installer
+
+          if (-not (Test-Path $installer)) {
+            throw "Inno Setup installer was not downloaded: $installer"
+          }
+
+          $actualHash = (Get-FileHash -Path $installer -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actualHash -ne $env:INNO_SETUP_SHA256) {
+            throw "Inno Setup installer hash mismatch. Expected $env:INNO_SETUP_SHA256, got $actualHash"
+          }
+
+          $installDir = Join-Path ${env:ProgramFiles} 'Inno Setup 6'
+          $arguments = @(
+            '/VERYSILENT'
+            '/SUPPRESSMSGBOXES'
+            '/NORESTART'
+            "/DIR=`"$installDir`""
+          )
+          $process = Start-Process -FilePath $installer -ArgumentList $arguments -WorkingDirectory $env:TEMP -Wait -PassThru
+          if ($process.ExitCode -ne 0) {
+            throw "Inno Setup installer failed with exit code $($process.ExitCode)"
+          }
+
+          $iscc = Join-Path $installDir 'ISCC.exe'
+          if (-not (Test-Path $iscc)) {
+            throw "Inno Setup compiler was not installed: $iscc"
+          }
+          "INNO_SETUP_COMPILER=$iscc" >> $env:GITHUB_ENV
 
       - name: Compile Setup
-        shell: cmd
+        shell: pwsh
         run: |
-          set TAG=%GITHUB_REF_NAME%
-          "C:\Program Files\Inno Setup 6\ISCC.exe" setup.iss /dMyAppVersion=%RELEASE_VERSION%
+          & $env:INNO_SETUP_COMPILER setup.iss "/dMyAppVersion=$env:RELEASE_VERSION"
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
 
       - name: Create Release & Upload
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.release_tag || github.ref_name }}
           files: "CASSIE-CWC-Tool-Setup-*.exe"
