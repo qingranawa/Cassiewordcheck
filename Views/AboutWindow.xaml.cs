@@ -9,6 +9,10 @@ internal static class AboutWindowChangelog
     public const string ChangelogText = """
 # 更新日志
 
+## `v2.5.1`（2026-08-08）— Velopack EXE 安装程序
+### 发布调整
+- **分发方式调整** — 从 MSIX 改为 Velopack EXE 安装程序，应用改为自包含发布
+
 ## `v2.5.0`（2026-08-08）— WinUI 3、Windows App SDK 与 MSIX 全量迁移
 ### 架构调整
 - **新增 WinUI 3 应用壳** — 基于 Windows App SDK 1.8 和 Fluent NavigationView 重建桌面入口，保留单实例与本地数据迁移能力
