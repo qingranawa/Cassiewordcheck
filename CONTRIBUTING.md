@@ -55,27 +55,33 @@ dotnet build
 
 ### 本地一键打包
 
-项目根目录的 `publish.bat` 用于快速生成 WinUI 单项目 MSIX：
+项目根目录的 `publish.bat` 会调用 `scripts/pack-velopack.ps1`，用于生成 WinUI 3 unpackaged 应用的 Velopack 安装产物。也可以直接调用打包脚本：
 
-```bat
-:: 直接双击运行，输出到 CassieWordCheck.WinUI/bin/Release/AppPackages/ 目录
+```powershell
+# 直接调用 Velopack 打包脚本
+pwsh -NoProfile -File scripts/pack-velopack.ps1 -Configuration Release -Version 2.5.1
+
+# 或使用根目录批处理
 publish.bat
 ```
 
 执行流程：
 
-1. 恢复 `CassieWordCheck.WinUI` 和 Core 依赖
-2. 以 x64 构建 WinUI 3 应用
-3. 生成未签名 MSIX 到 `CassieWordCheck.WinUI/bin/Release/AppPackages/`
+1. 恢复项目依赖和本地 .NET 工具
+2. 以 x64 发布带 Windows App SDK self-contained 运行时的 WinUI 3 unpackaged 应用
+3. 使用 Velopack 生成安装程序、发布 feed、完整包和增量包
 
 输出结构：
 
 ```
-CassieWordCheck.WinUI/bin/Release/AppPackages/
-└── CassieWordCheck.WinUI_2.5.0.0_x64_Release_Test/
-    ├── CassieWordCheck.WinUI_2.5.0.0_x64_Release.msix
-    └── Install.ps1
+dist/velopack/Releases/
+├── Setup.exe
+├── releases.win.json
+├── qingranawa.CassieWordCheck-2.5.1-full.nupkg
+└── qingranawa.CassieWordCheck-2.5.1-delta.nupkg
 ```
+
+其中完整包和增量包的文件名会随 `-Version` 参数变化。发布或提交变更前，请确认 `Setup.exe`、`releases.win.json` 以及预期的完整包和增量包均位于 `dist/velopack/Releases`。
 
 ## 🔧 代码规范
 
@@ -141,15 +147,16 @@ perf: 减少同时并发动画数
 1. 更新 `CassieWordCheck.WinUI.csproj` 中的 `<Version>` 和 `<FileVersion>`
 2. 更新 `Views/AboutWindow.xaml.cs` 中的更新日志 `ChangelogText`
 3. 确认所有 locale JSON 文件已更新
-4. 提交代码并推送至 `main` 分支
-5. 打 tag 并推送，触发 GitHub Actions 自动构建
+4. 运行现有测试并完成代码审查
+5. 提交代码并推送至 `main` 分支
+6. 创建并推送符合 `vX.Y.Z` 格式的标签，触发 GitHub Actions 自动构建
 
 ```bash
-git tag v2.3.0
-git push origin v2.3.0
+git tag v2.5.1
+git push origin v2.5.1
 ```
 
-GitHub Actions 会自动编译、打包并上传到 Releases 页面。
+推送 `vX.Y.Z` 标签会触发 GitHub Actions 工作流。工作流会保留标签格式校验和 Core 测试，然后调用 `scripts/pack-velopack.ps1`，将 `dist/velopack/Releases` 下的 `Setup.exe`、`releases.win.json`、完整包和增量包全部上传到 GitHub Release。
 
 ## 📁 项目结构说明
 

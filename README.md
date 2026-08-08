@@ -33,7 +33,7 @@
 | 🔄 **自动更新** | 启动时自动检查 GitHub 新版本 |
 | 🚫 **单实例** | 防止多开，避免数据冲突 |
 | 🧰 **词库管理** | 排除列表、差异对比和差异报告导出 |
-| 📦 **MSIX 发布** | WinUI 单项目 MSIX，支持 x64 安装包生成 |
+| 📦 **Velopack 发布** | WinUI 3 unpackaged 应用与 Windows App SDK self-contained 运行时，生成传统按用户安装包 |
 
 ## 🖼️ 截图
 
@@ -43,26 +43,23 @@
 
 ### 方法一：下载 Release（推荐）
 
-前往 [Releases 页面](https://github.com/qingranawa/Cassiewordcheck/releases) 下载最新的 `CassieWordCheck*.msix`，按 Windows 提示安装即可。开发包默认未签名，正式发行时应替换为受信任的签名证书。
+前往 [Releases 页面](https://github.com/qingranawa/Cassiewordcheck/releases) 下载最新的 `Setup.exe`，双击运行安装。应用采用 WinUI 3 unpackaged 模式，发布包内置 Windows App SDK self-contained 运行时，并通过 Velopack 提供传统的按用户安装方式。安装过程中不需要导入证书，也不需要使用 Windows App Installer。
 
 ### 方法二：自行构建
 
-```bash
+```powershell
 # 克隆仓库
 git clone https://github.com/qingranawa/Cassiewordcheck.git
 cd CassieWordCheck
 
-# 恢复依赖
-dotnet restore CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj
+# 直接调用 Velopack 打包脚本
+pwsh -NoProfile -File scripts/pack-velopack.ps1 -Configuration Release -Version 2.5.1
 
-# 构建 WinUI 3 应用
-dotnet build CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj -c Release -p:Platform=x64
-
-# 生成 MSIX（输出到 CassieWordCheck.WinUI/bin/Release/AppPackages/）
-dotnet build CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj -c Release -p:Platform=x64 -p:PublishProfile=Properties/PublishProfiles/win10-x64.pubxml -p:GenerateAppxPackageOnBuild=true
+# 或使用根目录批处理
+publish.bat
 ```
 
-也可以运行项目根目录的 `publish.bat`。
+打包完成后，所有 Velopack 产物位于 `dist/velopack/Releases`，包括 `Setup.exe`、`releases.win.json`、完整包（`*-full.nupkg`）和增量包（`*-delta.nupkg`）。
 
 ## 🎮 使用方式
 
@@ -80,12 +77,12 @@ dotnet build CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj -c Release -p:Pl
 CassieWordCheck/
 ├── CassieWordCheck.sln       解决方案
 ├── CassieWordCheck.Core/     无 UI 的模型、检查引擎和数据服务
-├── CassieWordCheck.WinUI/    WinUI 3 + Windows App SDK 应用与单项目 MSIX
+├── CassieWordCheck.WinUI/    WinUI 3 unpackaged + Windows App SDK 应用与 Velopack 发布
 │   ├── App.xaml              应用入口与全局资源
 │   ├── MainWindow.xaml       Fluent NavigationView 主窗口
 │   ├── Views/Pages/          检查、历史、统计、词库、设置和关于页面
-│   ├── Assets/               MSIX 图标与启动图资源
-│   └── Package.appxmanifest  MSIX 包清单
+│   ├── Assets/               应用图标与启动图资源
+│   └── Package.appxmanifest  应用清单配置
 ├── CassieWordCheck.Tests/    核心逻辑与迁移回归测试
 │
 ├── Models/                   数据模型 & 核心逻辑
@@ -105,25 +102,28 @@ CassieWordCheck/
 │   ├── AAA.JPG              工具栏图标
 │   └── qr.JPG               头像
 │
-├── publish.bat              一键生成 WinUI MSIX 脚本
+├── publish.bat              一键生成 Velopack 安装产物
+├── scripts/pack-velopack.ps1 Velopack 打包脚本
+├── dist/velopack/Releases/   Velopack 发布产物
 ├── .github/workflows/       GitHub Actions 自动发布
-└── CassieWordCheck.WinUI/bin/  构建与 MSIX 输出
+└── CassieWordCheck.WinUI/bin/  本地构建缓存
 ```
 
 ## 🔧 技术栈
 
 - **.NET 8** + **WinUI 3** + **Windows App SDK 1.8**
-- **单项目 MSIX** — 使用 Windows SDK Build Tools 生成 x64 安装包
+- **WinUI 3 unpackaged** — 与 Windows App SDK self-contained 运行时一起发布
+- **Velopack** — 生成 `Setup.exe`、发布 feed、完整包和增量包
 - **CommunityToolkit.Mvvm** — MVVM 辅助
 - **ClosedXML** — Excel (.xlsx) 导入支持
 - **System.Text.Json** — JSON 序列化
 - **GitHub API** — 自动更新检查
-- **GitHub Actions** — CI/CD 自动构建
+- **GitHub Actions** — CI/CD 自动构建并发布 Velopack 产物
 
 ## 📋 系统要求
 
 - Windows 10 22H2（最低构建版本 19041）或 Windows 11
-- MSIX 安装时由包管理器处理 Windows App SDK 依赖
+- Release 安装包内置 Windows App SDK self-contained 运行时，不需要额外安装运行时或导入证书
 
 ## 🤝 参与贡献
 

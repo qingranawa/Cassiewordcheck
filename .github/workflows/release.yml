@@ -49,15 +49,12 @@ jobs:
       - name: Restore WinUI 3 project
         run: dotnet restore CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj
 
-      - name: Build unsigned MSIX
+      - name: Package with Velopack
         shell: pwsh
-        run: |
-          $releaseVersion = $env:RELEASE_VERSION
-          $fileVersion = "$releaseVersion.0"
-          dotnet build CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj -c Release -p:Platform=x64 -p:PublishProfile=Properties\PublishProfiles\win10-x64.pubxml -p:GenerateAppxPackageOnBuild=true -p:AppxPackageSigningEnabled=false "-p:Version=$releaseVersion" "-p:FileVersion=$fileVersion" --verbosity quiet
+        run: pwsh -NoProfile -File scripts/pack-velopack.ps1 -Configuration Release -Version $env:RELEASE_VERSION
 
       - name: Create Release & Upload
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.release_tag || github.ref_name }}
-          files: "CassieWordCheck.WinUI/bin/Release/AppPackages/**/*.msix"
+          files: "dist/velopack/Releases/**"
