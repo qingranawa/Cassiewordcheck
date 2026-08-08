@@ -11,10 +11,15 @@ public sealed class WinUiStoragePathProvider
 
     public string LegacyDataDirectory => Path.Combine(AppContext.BaseDirectory, "data");
 
+    public IReadOnlyList<string> LegacyDataDirectories =>
+        AppDataPaths.GetLegacyDataDirectories();
+
     public string LocaleDirectory => Path.Combine(AppContext.BaseDirectory, "Resources", "Locales");
 
     public StorageMigrationResult MigrateLegacyData()
     {
-        return StorageMigrationService.Migrate(LegacyDataDirectory, LocalDataDirectory);
+        return StorageMigrationService.MigrateFromDirectories(
+            LegacyDataDirectories,
+            LocalDataDirectory);
     }
 }

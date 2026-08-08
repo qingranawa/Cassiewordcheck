@@ -9,11 +9,7 @@ public static class AppDataPaths
 
     public static string GetUserDataDirectory()
     {
-        var root = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        if (string.IsNullOrWhiteSpace(root))
-            root = Path.GetTempPath();
-
-        return Path.Combine(root, ProductDirectoryName);
+        return Path.Combine(GetLocalApplicationDataDirectory(), ProductDirectoryName);
     }
 
     public static string GetUserLocalDataDirectory() =>
@@ -32,6 +28,50 @@ public static class AppDataPaths
 
     public static string GetLegacyDataDirectory() =>
         Path.Combine(AppContext.BaseDirectory, "data");
+
+    /// <summary>
+    /// 按安装目录优先、旧 MSIX 目录其次返回所有旧数据目录喵
+    /// </summary>
+    public static IReadOnlyList<string> GetLegacyDataDirectories() =>
+        [GetLegacyDataDirectory(), .. GetLegacyMsixDataDirectories()];
+
+    /// <summary>
+    /// 查找旧 MSIX 在 LocalState 下保存的数据目录喵
+    /// </summary>
+    public static IReadOnlyList<string> GetLegacyMsixDataDirectories(string? localAppDataRoot = null)
+    {
+        var root = string.IsNullOrWhiteSpace(localAppDataRoot)
+            ? GetLocalApplicationDataDirectory()
+            : localAppDataRoot!;
+
+        try
+        {
+            var packagesDirectory = Path.Combine(root, "Packages");
+            return Directory.GetDirectories(
+                    packagesDirectory,
+                    $"{ProductDirectoryName}_*",
+                    SearchOption.TopDirectoryOnly)
+                .OrderBy(directory => directory, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(directory => directory, StringComparer.Ordinal)
+                .Select(directory => Path.Combine(directory, "LocalState", "data"))
+                .Where(Directory.Exists)
+                .ToArray();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Array.Empty<string>();
+        }
+        catch (IOException)
+        {
+            return Array.Empty<string>();
+        }
+    }
+
+    private static string GetLocalApplicationDataDirectory()
+    {
+        var root = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        return string.IsNullOrWhiteSpace(root) ? Path.GetTempPath() : root;
+    }
 
     /// <summary>
     /// 将旧安装目录中的用户文件复制到新目录。
