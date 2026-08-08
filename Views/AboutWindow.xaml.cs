@@ -12,6 +12,8 @@ internal static class AboutWindowChangelog
 ## `v2.5.1`（2026-08-08）— Velopack EXE 安装程序
 ### 发布调整
 - **分发方式调整** — 从 MSIX 改为 Velopack EXE 安装程序，应用改为自包含发布
+- **版本与验证流程统一** — 由 Directory.Build.props 统一提供 2.5.1 和 2.5.1.0 元数据，迁移验证改为校验 Velopack 发布产物
+- **用户数据迁移** — 用户数据迁移到 LocalAppData，并兼容旧 MSIX LocalState
 
 ## `v2.5.0`（2026-08-08）— WinUI 3、Windows App SDK 与 MSIX 全量迁移
 ### 架构调整

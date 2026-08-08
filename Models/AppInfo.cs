@@ -4,5 +4,5 @@ namespace CassieWordCheck.Models;
 public static class AppInfo
 {
     /// <summary>当前版本号</summary>
-    public const string Version = "2.5.0";
+    public const string Version = "2.5.1";
 }
