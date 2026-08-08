@@ -16,6 +16,9 @@ public static class AppDataPaths
         return Path.Combine(root, ProductDirectoryName);
     }
 
+    public static string GetUserLocalDataDirectory() =>
+        Path.Combine(GetUserDataDirectory(), "data");
+
     public static string GetUserFilePath(string fileName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);

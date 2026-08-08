@@ -6,6 +6,26 @@ namespace CassieWordCheck.Tests;
 public class AppDataPathsTests
 {
     [Fact]
+    public void GetUserLocalDataDirectory_位于产品用户数据目录下()
+    {
+        var expected = Path.Combine(
+            AppDataPaths.GetUserDataDirectory(),
+            "data");
+
+        var actual = AppDataPaths.GetUserLocalDataDirectory();
+
+        Assert.Equal(expected, actual);
+        Assert.StartsWith(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            actual,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(
+            Path.GetFullPath(AppContext.BaseDirectory),
+            actual,
+            StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void MigrateLegacyFile_目标不存在时复制旧文件()
     {
         var root = CreateTempDirectory();

@@ -1,4 +1,4 @@
-using Windows.Storage;
+using CassieWordCheck.Models;
 
 namespace CassieWordCheck.Services;
 
@@ -7,7 +7,7 @@ namespace CassieWordCheck.Services;
 /// </summary>
 public sealed class WinUiStoragePathProvider
 {
-    public string LocalDataDirectory => Path.Combine(ApplicationData.Current.LocalFolder.Path, "data");
+    public string LocalDataDirectory => AppDataPaths.GetUserLocalDataDirectory();
 
     public string LegacyDataDirectory => Path.Combine(AppContext.BaseDirectory, "data");
 

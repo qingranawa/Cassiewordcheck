@@ -1,7 +1,7 @@
 namespace CassieWordCheck.Services;
 
 /// <summary>
-/// 将旧安装目录中的可变数据复制到 MSIX LocalFolder 喵
+/// 将旧安装目录中的可变数据复制到每用户 LocalAppData 数据目录喵
 /// </summary>
 public static class StorageMigrationService
 {
