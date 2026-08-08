@@ -158,7 +158,7 @@
   "exclude.clear": "ล้างรายการยกเว้น",
   "exclude.empty": "ยังไม่มีคำที่ยกเว้น",
   "about.title": "เกี่ยวกับ CASSIE",
-  "about.subtitle": "WinUI 3 · Windows App SDK · MSIX",
+  "about.subtitle": "WinUI 3 · Windows App SDK · ตัวติดตั้ง Velopack EXE",
   "about.description": "CASSIE เป็นเครื่องมือเดสก์ท็อปสำหรับตรวจข้อความและช่วยสะกดคำ",
   "about.github": "เปิดคลัง GitHub",
   "about.features": "คุณสมบัติ",

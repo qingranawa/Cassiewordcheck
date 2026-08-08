@@ -143,7 +143,7 @@ perf: 减少同时并发动画数
 
 ## 🚀 发版流程
 
-1. 更新 `CassieWordCheck.WinUI.csproj` 中的 `<Version>` 和 `<FileVersion>`
+1. 更新 `Directory.Build.props` 中的 `<VersionPrefix>`、`<AssemblyVersion>` 和 `<FileVersion>`
 2. 更新 `Views/AboutWindow.xaml.cs` 中的更新日志 `ChangelogText`
 3. 确认所有 locale JSON 文件已更新
 4. 运行现有测试并完成代码审查

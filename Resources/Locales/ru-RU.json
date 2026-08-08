@@ -148,7 +148,7 @@
   "exclude.clear": "Очистить список исключений",
   "exclude.empty": "Нет исключённых слов.",
   "about.title": "О CASSIE",
-  "about.subtitle": "WinUI 3 · Windows App SDK · MSIX",
+  "about.subtitle": "WinUI 3 · Windows App SDK · установщик Velopack EXE",
   "about.description": "CASSIE — настольный инструмент проверки текста и помощи в исправлении орфографии.",
   "about.github": "Открыть репозиторий GitHub",
   "about.features": "Возможности",

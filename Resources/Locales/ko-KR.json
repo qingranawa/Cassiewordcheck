@@ -149,7 +149,7 @@
   "exclude.clear": "제외 목록 지우기",
   "exclude.empty": "제외된 단어가 없습니다.",
   "about.title": "CASSIE 정보",
-  "about.subtitle": "WinUI 3 · Windows App SDK · MSIX",
+  "about.subtitle": "WinUI 3 · Windows App SDK · Velopack EXE 설치 관리자",
   "about.description": "CASSIE는 방송 텍스트 검사와 철자 보조를 위한 데스크톱 도구입니다.",
   "about.github": "GitHub 저장소 열기",
   "about.features": "기능",

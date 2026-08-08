@@ -149,7 +149,7 @@
   "exclude.clear": "除外リストをクリア",
   "exclude.empty": "除外された単語はありません。",
   "about.title": "CASSIE について",
-  "about.subtitle": "WinUI 3 · Windows App SDK · MSIX",
+  "about.subtitle": "WinUI 3 · Windows App SDK · Velopack EXE インストーラー",
   "about.description": "CASSIE は放送テキストの辞書チェックとスペル支援を行うデスクトップツールです。",
   "about.github": "GitHub リポジトリを開く",
   "about.features": "機能",
