@@ -61,7 +61,8 @@ public class ProjectIntegrityValidatorTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "CassieWordCheck.csproj")))
+            if (File.Exists(Path.Combine(directory.FullName, "CassieWordCheck.sln")) ||
+                File.Exists(Path.Combine(directory.FullName, "CassieWordCheck.WinUI", "CassieWordCheck.WinUI.csproj")))
                 return directory.FullName;
             directory = directory.Parent;
         }

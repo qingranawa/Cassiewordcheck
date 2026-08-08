@@ -268,96 +268,7 @@ public class RegressionRedTeamTests
         Assert.Equal(1000, freq["badword"]);
     }
 
-    // ========== 弹窗相关的边界条件（模拟 DocumentBuilder Tag 设置） ==========
-
-    [Fact]
-    public void BuildResultDocument_可用词_Tag为null()
-    {
-        var results = new List<CheckResult>
-        {
-            new("hello", CheckStatus.Available),
-        };
-
-        var doc = DocumentBuilder.BuildResultDocument(results, 400);
-
-        // Verify via reflection: the Run's Tag should be null for available words
-        var paragraph = (System.Windows.Documents.Paragraph)doc.Blocks.FirstBlock;
-        var run = (System.Windows.Documents.Run)paragraph.Inlines.FirstInline;
-        Assert.Null(run.Tag);
-    }
-
-    [Fact]
-    public void BuildResultDocument_不可用词_Tag存储CheckResult()
-    {
-        var checkResult = new CheckResult("badword", CheckStatus.Unavailable);
-        var results = new List<CheckResult> { checkResult };
-
-        var doc = DocumentBuilder.BuildResultDocument(results, 400);
-
-        var paragraph = (System.Windows.Documents.Paragraph)doc.Blocks.FirstBlock;
-        var run = (System.Windows.Documents.Run)paragraph.Inlines.FirstInline;
-        Assert.NotNull(run.Tag);
-        Assert.IsType<CheckResult>(run.Tag);
-
-        var tag = (CheckResult)run.Tag;
-        Assert.Equal("badword", tag.Text);
-        Assert.Equal(CheckStatus.Unavailable, tag.Status);
-    }
-
-    [Fact]
-    public void BuildResultDocument_不可用词_ToolTip为null_避免与Popup冲突()
-    {
-        var results = new List<CheckResult>
-        {
-            new("badword", CheckStatus.Unavailable),
-        };
-
-        var doc = DocumentBuilder.BuildResultDocument(results, 400);
-
-        var paragraph = (System.Windows.Documents.Paragraph)doc.Blocks.FirstBlock;
-        var run = (System.Windows.Documents.Run)paragraph.Inlines.FirstInline;
-        Assert.Null(run.ToolTip); // 显式设置为 null，避免 Popup 与 ToolTip 同时出现
-    }
-
-    [Fact]
-    public void BuildResultDocument_忽略词_Tag为null()
-    {
-        var results = new List<CheckResult>
-        {
-            new("link", CheckStatus.Ignored),
-        };
-
-        var doc = DocumentBuilder.BuildResultDocument(results, 400);
-
-        var paragraph = (System.Windows.Documents.Paragraph)doc.Blocks.FirstBlock;
-        var run = (System.Windows.Documents.Run)paragraph.Inlines.FirstInline;
-        Assert.Null(run.Tag);
-    }
-
-    [Fact]
-    public void BuildResultDocument_空结果_不抛异常()
-    {
-        var ex = Record.Exception(() =>
-            DocumentBuilder.BuildResultDocument(new List<CheckResult>(), 400));
-
-        Assert.Null(ex);
-    }
-
-    [Fact]
-    public void BuildResultDocument_仅换行符_不抛异常()
-    {
-        var results = new List<CheckResult>
-        {
-            new("\n", CheckStatus.Separator),
-        };
-
-        var ex = Record.Exception(() =>
-            DocumentBuilder.BuildResultDocument(results, 400));
-
-        Assert.Null(ex);
-    }
-
-    // ========== LevenshteinHelper 边界（弹窗依赖） ==========
+    // ========== LevenshteinHelper 边界 ==========
 
     [Fact]
     public void FindClosest_候选列表中包含自身_距离0排在首位()
@@ -397,7 +308,7 @@ public class RegressionRedTeamTests
         var checker = new Checker(wl);
         var results = new List<CheckResult>();
 
-        // 这个测试验证的是逻辑正确性，而非 UI 绑定（UI 需在 WPF STA 线程）
+        // 这个测试验证的是逻辑正确性，而非 UI 绑定（UI 由 WinUI 页面负责）
         // 我们验证 Checker.CheckText 返回空时的正确性即可
         var checkResults = checker.CheckText("");
 

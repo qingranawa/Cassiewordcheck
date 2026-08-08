@@ -1,106 +1,72 @@
 ---
-last_updated: 2026-05-28
-updated_by: superpowers-memory:rebuild
-triggered_by_plan: null
+last_updated: 2026-08-08
+updated_by: codex
+covers_branch: winui3-msix
 ---
 
 # 架构
 
 ## 模式概述
 
-**总体模式：** 单部署 WPF 桌面应用——MVVM-lite + code-behind，面向服务的内部架构。
+项目采用 Core 领域层加 WinUI 3 应用层的分层结构，并通过单项目 MSIX 发布。Core 只处理检查、词库、设置、历史、建议、统计和数据迁移，不引用任何窗口或控件类型；WinUI 层负责页面、状态协调和 Windows 平台适配。
 
-**关键特征：**
-- 单体 WPF 桌面应用；所有组件在同一程序集中，通过直接方法调用通信
-- 文本处理流水线：分词 → 过滤 → 查词 → 渲染，由实时输入驱动
-- JSON 持久化配置和历史；词库使用 FrozenSet 实现 O(1) 查询；用户可写数据与安装目录分离
-
-## 系统上下文
-
-**角色：**
-- 最终用户（SCP:SL 内容创作者/服务器管理员）——粘贴文本、查看检查结果、管理白名单
-
-**外部系统：**
-- GitHub API —— 自动更新检查（通过 `UpdateService`）
-- 文件系统 —— 词库 TXT、配置 JSON、历史 JSON、多语言 JSON、导入文件
-- Windows DWM —— 暗色标题栏 + Mica 背景（通过 `WindowHelper`）
+文本处理流水线为：分词 → 格式与命名过滤 → 查词 → `ResultSegment` 构建 → Fluent 页面渲染。设置与历史使用 JSON，MSIX 安装目录保持只读，用户可写数据位于 `ApplicationData.Current.LocalFolder/data`。
 
 ## 分层
 
-**Models** —— 核心业务逻辑和数据。`Models/`
-- `Checker` —— 文本分词/过滤/查词；`WordList` —— FrozenSet 词库；`CheckResult` / `CheckStatus` —— 结果模型；`HistoryStore` —— 持久化历史；`Settings` —— 持久化用户配置
+`CassieWordCheck.Core/` 承载 `Models/` 中的 `Checker`、`WordList`、`Settings`、`HistoryStore` 和结果模型，以及 `Resources/Services/` 中链接进 Core 的编辑距离、建议、字数统计、更新、本地化和数据迁移服务。
 
-**Services** —— 横切工具类。`Resources/Services/`
-- `LocalizationService` —— 多语言（惰性加载 JSON + 缓存）；`LevenshteinHelper` —— 编辑距离拼写建议；`DocumentBuilder` —— 结果 → `FlowDocument`；`MarkdownConverter` —— Markdown → FlowDocument；`UpdateService` —— GitHub 发布检查；`WindowHelper` —— Win32 DWM 集成
+`CassieWordCheck.WinUI/` 是唯一桌面 UI 工程，使用 WinUI 3、Windows App SDK 1.8、NavigationView、Frame、ContentDialog、Mica 和 Fluent ResourceDictionary。`AppState` 统一持有 Core 服务，`Views/Pages/` 按功能分为主页、历史、统计、字数、词库、设置和关于页面。
 
-**Views** —— WPF 窗口。`Views/`
-- `MainWindow` —— 主界面（输入/结果/统计/建议）；`SettingsWindow` —— 设置；`StatisticsWindow` —— 趋势图表；`HistoryWindow` —— 检查历史；`WhitelistWindow` —— 白名单管理；`AboutWindow` —— 关于页面
+`CassieWordCheck.WinUI/Package.appxmanifest`、`Assets/` 和 `Properties/PublishProfiles/win10-x64.pubxml` 构成单项目 MSIX 入口。签名属性默认关闭，CI 或正式发布环境通过证书属性启用签名。
 
-**Resources** —— 静态资源。`Resources/`
-- `Styles.xaml` —— 全局暗色主题；`Locales/*.json` —— 多语言翻译（8 种语言）；`ProjectIntegrityValidator` —— 发布资源完整性检查
+## 调用方向
 
-**调用方向规则：**
-- Views → Models（直接实例化/构造函数注入）
-- Views → Services（直接方法调用）
-- Models → 不依赖 Views 或 Services（纯逻辑）
-- Services → 不依赖 Views
+WinUI 页面 → `AppState` → Core 模型与服务；WinUI 平台服务集中处理文件选择、剪贴板、窗口句柄和对话框。Core 不反向引用 WinUI，也不直接访问 Dispatcher、Window 或 Control。
 
-## 场景序列
-
-### 文本检查流程
+## 文本检查流程
 
 ```mermaid
 sequenceDiagram
     participant User as 用户
-    participant MainWindow as 主窗口
-    participant Checker as 检查引擎
-    participant WordList as 词库
-    participant DocumentBuilder as 文档构建器
-    participant StatsBar as 统计栏
+    participant Home as HomePage
+    participant State as AppState
+    participant Checker as Checker
+    participant List as WordList
+    participant Builder as ResultSegmentBuilder
 
-    User->>MainWindow: 输入/粘贴文本
-    MainWindow->>MainWindow: 防抖 80ms
-    MainWindow->>Checker: CheckText(text)
-    Checker->>Checker: 分词 → 过滤
-    Checker->>WordList: Check(word)
-    WordList-->>Checker: 可用/不可用
-    Checker-->>MainWindow: List<CheckResult>
-    MainWindow->>DocumentBuilder: BuildResultDocument(results)
-    DocumentBuilder-->>MainWindow: FlowDocument
-    MainWindow->>Checker: GetStatistics(results)
-    Checker-->>MainWindow: 统计字典
-    MainWindow->>StatsBar: 更新覆盖率和计数
-    MainWindow->>MainWindow: Levenshtein 拼写建议
-    MainWindow-->>User: 渲染结果
+    User->>Home: 输入或导入文本
+    Home->>State: CheckText(text)
+    State->>Checker: CheckText(text)
+    Checker->>List: Check(word)
+    List-->>Checker: 可用或不可用
+    Checker-->>State: List<CheckResult>
+    State->>Builder: Build(results)
+    Builder-->>State: ResultSegment 集合
+    State-->>Home: 统计、结果片段和建议
+    Home-->>User: Fluent 结果卡片
 ```
 
-### 设置变更流程
+## 数据迁移流程
 
 ```mermaid
 sequenceDiagram
-    participant User as 用户
-    participant MainWindow as 主窗口
-    participant SettingsWindow as 设置窗口
-    participant Settings as 配置
-    participant Checker as 检查引擎
+    participant App as App
+    participant Migration as StorageMigrationService
+    participant Legacy as 旧 data 目录
+    participant Local as MSIX LocalFolder/data
+    participant State as AppState
 
-    User->>MainWindow: 点击 ⚙ 设置
-    MainWindow->>SettingsWindow: ShowDialog(settings, checker, wordlist, localization)
-    User->>SettingsWindow: 切换过滤/语言/字体
-    SettingsWindow->>Checker: 应用过滤标记
-    SettingsWindow->>Settings: 更新属性
-    SettingsWindow-->>MainWindow: DialogResult = true
-    MainWindow->>MainWindow: UpdateUILanguage()
-    MainWindow->>Checker: CheckText(text)
-    MainWindow-->>User: 刷新结果
+    App->>Migration: Migrate(legacy, local)
+    Migration->>Local: 创建目录
+    Migration->>Legacy: 查找 appsettings.json / history.json
+    Migration->>Local: 仅在目标缺失时复制
+    App->>State: 读取本地设置和历史
 ```
-
-## 关键对象状态机
-
-不适用——单部署 WPF 应用，无跨模块聚合状态转换。状态管理限于内存中的 UI 状态和 JSON 持久化配置。
 
 ## 关键设计决策
 
-- **[使用 WPF 而非其他 UI 框架]** —— 见 ADR-001
-- **[使用 FrozenSet 做词库查询]** —— 见 ADR-002
-- **[使用 JSON 而非 SQLite 做持久化]** —— 见 ADR-003
+- WinUI 3 + Windows App SDK 1.8：统一桌面 UI、Fluent 交互和 Windows 10/11 支持。
+- `FrozenSet`：词库加载后提供稳定的 O(1) 查询，并在批量导入后重新构建。
+- JSON：保持原有用户数据格式，迁移成本低且便于手工检查。
+- 单项目 MSIX：清单、资源和应用入口位于同一 WinUI 工程，减少 WAP 项目依赖并支持命令行生成 x64 包。

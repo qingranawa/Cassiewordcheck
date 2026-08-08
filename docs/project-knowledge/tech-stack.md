@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-07-29
-updated_by: superpowers-memory:rebuild
-triggered_by_plan: null
+last_updated: 2026-08-08
+updated_by: codex
+covers_branch: winui3-msix
 ---
 
 # 技术栈
@@ -10,39 +10,43 @@ triggered_by_plan: null
 
 | 技术 | 角色 | 版本 | 备注 |
 |------|------|------|------|
-| C# | 应用语言 | 12 (.NET 8) | 启用可为空引用类型，启用隐式 using |
-| .NET | 运行时框架 | 8.0-windows | WinExe 输出，支持自包含发布 |
-| WPF | 桌面 UI 框架 | net8.0-windows | 使用 XAML + code-behind 模式 |
-
-## 运行时
-
-**运行环境：** Windows 10 1809+ / Windows 11
-**运行时：** .NET 8（自包含发布打包运行时；依赖框架安装需要 .NET 8 运行时）
-**单实例：** 通过 app.manifest + mutex 强制
+| C# | 应用语言 | 12 / .NET 8 | 启用可为空引用类型和隐式 using |
+| WinUI 3 | 桌面 UI | Windows App SDK 1.8.260508005 | Fluent XAML、NavigationView、Mica |
+| MSIX | 安装与分发 | Windows SDK Build Tools | 单项目 x64 包，默认生成未签名测试包 |
+| xUnit | 测试 | 2.9.2 | Core 领域和迁移回归测试 |
 
 ## 关键依赖
 
-| 包 | 用途 | 选择理由 |
-|----|------|----------|
-| CommunityToolkit.Mvvm 8.4.0 | MVVM 辅助（ObservableObject, RelayCommand） | 轻量级，微软官方维护，与 .NET 8 兼容 |
-| ClosedXML 0.102.3 | Excel (.xlsx) 词库导入 | 纯 .NET 实现，无需 Excel 互操作，可处理大文件 |
+| 包 | 用途 |
+|----|------|
+| CommunityToolkit.Mvvm 8.4.0 | WinUI 状态和 MVVM 辅助 |
+| ClosedXML 0.102.3 | Excel `.xlsx` 词库导入 |
+| System.Text.Json | 设置、历史和多语言 JSON |
 
-## 构建与开发工具
+## 工程结构
 
-| 工具 | 用途 |
-|------|------|
-| dotnet CLI | 构建、还原、发布 |
-| GitHub Actions | CI/CD —— 自动构建 + 发布 |
-| publish.bat | 一键发布脚本 |
+`CassieWordCheck.Core` 是无 UI 类库；`CassieWordCheck.WinUI` 是唯一桌面可执行项目，同时承载 MSIX 清单和资源；`CassieWordCheck.Tests` 只引用 Core，避免测试依赖桌面 UI。
 
-## 配置
+## 构建与发布
 
-**版本：** `Directory.Build.props` —— 统一维护 `VersionPrefix`、`AssemblyVersion` 和 `FileVersion`
-**运行时：** `%LOCALAPPDATA%\CassieWordCheck\appsettings.json` 与 `history.json` —— 自动创建的 JSON，保存用户偏好和检查历史；首次启动迁移旧安装目录中的同名文件
-**构建：** `CassieWordCheck.csproj` —— Release win-x64 自包含文件夹发布，Inno Setup 生成安装包
-**校验：** `CassieWordCheck.Tests` —— xUnit 回归测试与词库/本地化资源完整性检查
+开发构建：
+
+```powershell
+dotnet build CassieWordCheck.sln --configuration Debug --no-restore
+```
+
+Release MSIX：
+
+```powershell
+dotnet build CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj --configuration Release `
+  -p:Platform=x64 `
+  -p:PublishProfile=Properties/PublishProfiles/win10-x64.pubxml `
+  -p:GenerateAppxPackageOnBuild=true `
+  -p:AppxPackageSigningEnabled=false
+```
+
+输出位于 `CassieWordCheck.WinUI/bin/Release/AppPackages/`。正式发布需要在 CI 中提供受信任的包签名证书，开发包可以使用未签名 MSIX 做结构验证。
 
 ## 平台要求
 
-**开发环境：** Windows 10+；Visual Studio 2022+ 或 JetBrains Rider；.NET 8 SDK
-**生产环境：** Windows 10 1809+（自包含）或 .NET 8 运行时（依赖框架）
+开发环境需要 Windows 10/11、Windows SDK 19041 或更高版本和 .NET 8 SDK。应用最低目标版本为 Windows 10 build 19041；MSIX 安装后由 Windows App SDK 包依赖处理运行时组件。

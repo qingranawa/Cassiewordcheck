@@ -1,0 +1,56 @@
+<local:AppPage x:Class="CassieWordCheck.Views.Pages.WordListPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:CassieWordCheck.Views.Pages">
+    <ScrollViewer>
+        <StackPanel MaxWidth="1080" Spacing="18">
+            <StackPanel Spacing="6">
+                <TextBlock x:Name="TitleTextBlock" Style="{StaticResource PageTitleTextBlockStyle}" />
+                <TextBlock x:Name="SubtitleTextBlock" Style="{StaticResource PageSubtitleTextBlockStyle}" />
+            </StackPanel>
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="180" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <TextBox x:Name="SearchBox" Grid.Column="0" TextChanged="OnSearchChanged" />
+                <ComboBox x:Name="SortCombo" Grid.Column="1" SelectionChanged="OnSortChanged" />
+                <Button x:Name="ReloadButton" Grid.Column="2" Click="OnReload" Style="{StaticResource SecondaryButtonStyle}" />
+                <Button x:Name="ImportButton" Grid.Column="3" Click="OnImport" Style="{StaticResource AccentButtonStyle}" />
+                <Button x:Name="CompareButton" Grid.Column="4" Click="OnCompare" Style="{StaticResource SecondaryButtonStyle}" />
+                <Button x:Name="ExportCompareButton" Grid.Column="5" Click="OnExportCompare" Style="{StaticResource SecondaryButtonStyle}" />
+            </Grid>
+            <Grid ColumnSpacing="18">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="1.15*" /><ColumnDefinition Width="0.85*" /></Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnSpacing="12"><TextBlock x:Name="TotalTextBlock" /><TextBlock x:Name="FilteredTextBlock" HorizontalAlignment="Right" /></Grid>
+                        <ListView x:Name="WordListView" MaxHeight="360" SelectionMode="None" BorderThickness="0" />
+                        <TextBlock x:Name="EmptyTextBlock" Style="{StaticResource PageSubtitleTextBlockStyle}" />
+                    </StackPanel>
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="18">
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="10">
+                            <TextBlock x:Name="WhitelistTitleTextBlock" FontSize="18" FontWeight="SemiBold" />
+                            <Grid ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions><TextBox x:Name="WhitelistInput" KeyDown="OnWhitelistKeyDown" /><Button x:Name="WhitelistAddButton" Grid.Column="1" Click="OnAddWhitelist" Style="{StaticResource AccentButtonStyle}" /></Grid>
+                            <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Name="WhitelistImportButton" Click="OnImportWhitelist" Style="{StaticResource SecondaryButtonStyle}" /><Button x:Name="WhitelistExportButton" Click="OnExportWhitelist" Style="{StaticResource SecondaryButtonStyle}" /><Button x:Name="WhitelistClearButton" Click="OnClearWhitelist" Style="{StaticResource SecondaryButtonStyle}" /></StackPanel>
+                            <ListView x:Name="WhitelistList" MaxHeight="180" SelectionMode="None" BorderThickness="0" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="10">
+                            <Grid>
+                                <TextBlock x:Name="ExcludeTitleTextBlock" FontSize="18" FontWeight="SemiBold" />
+                                <Button x:Name="ExcludeClearButton" HorizontalAlignment="Right" Click="OnClearExclude" Style="{StaticResource SecondaryButtonStyle}" />
+                            </Grid>
+                            <ListView x:Name="ExcludeList" MaxHeight="160" SelectionMode="None" BorderThickness="0" />
+                            <TextBlock x:Name="ExcludeEmptyTextBlock" Style="{StaticResource PageSubtitleTextBlockStyle}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource CardBorderStyle}">
+                        <StackPanel Spacing="8"><TextBlock x:Name="DistributionTitleTextBlock" FontSize="18" FontWeight="SemiBold" /><StackPanel x:Name="LengthDistributionPanel" Spacing="4" /><TextBlock x:Name="FirstLetterTitleTextBlock" Margin="0,12,0,0" FontSize="18" FontWeight="SemiBold" /><StackPanel x:Name="FirstLetterPanel" Spacing="4" /></StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+            <Border Style="{StaticResource CardBorderStyle}"><TextBlock x:Name="CompareTextBlock" TextWrapping="Wrap" /></Border>
+        </StackPanel>
+    </ScrollViewer>
+</local:AppPage>

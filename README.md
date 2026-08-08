@@ -1,7 +1,7 @@
 # CASSIE CWC Tool
 
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
-[![WPF](https://img.shields.io/badge/UI-WPF-512BD4)](https://github.com/dotnet/wpf)
+[![WinUI 3](https://img.shields.io/badge/UI-WinUI%203-0078D4)](https://learn.microsoft.com/windows/apps/winui/)
 [![Version](https://img.shields.io/github/v/release/qingranawa/Cassiewordcheck)](https://github.com/qingranawa/Cassiewordcheck/releases)
 [![Downloads](https://img.shields.io/github/downloads/qingranawa/Cassiewordcheck/total)](https://github.com/qingranawa/Cassiewordcheck/releases)
 [![Stars](https://img.shields.io/github/stars/qingranawa/Cassiewordcheck)](https://github.com/qingranawa/Cassiewordcheck)
@@ -21,7 +21,7 @@
 | 📊 **实时统计** | 可用数、不可用数、忽略数、覆盖率一目了然，进度条可视化 |
 | 💡 **拼写建议** | 对不可用词自动 Levenshtein 相似词推荐 |
 | 📋 **白名单管理** | 添加自定义豁免词，支持导入/导出 |
-| 🌐 **多语言界面** | 简体中文 / English / 日本語 / 한국어 / Deutsch / Русский / Français / ไทย |
+| 🌐 **多语言界面** | 简体中文 / English / 日本語 / 한국어 / Deutsch / Русский / Français |
 | 🔍 **格式过滤** | 自动忽略 link、color、size、split 等 CASSIE 格式标记 |
 | 🏷️ **命名过滤** | 屏蔽 MTF/UIU/GOC 等阵营缩写及北约代号、希腊字母 |
 | 🌙 **暗色主题** | Mica 毛玻璃效果，全组件平滑动画 |
@@ -32,6 +32,8 @@
 | 📈 **统计面板** | 折线图展示覆盖率 / 不可用词历史趋势 |
 | 🔄 **自动更新** | 启动时自动检查 GitHub 新版本 |
 | 🚫 **单实例** | 防止多开，避免数据冲突 |
+| 🧰 **词库管理** | 排除列表、差异对比和差异报告导出 |
+| 📦 **MSIX 发布** | WinUI 单项目 MSIX，支持 x64 安装包生成 |
 
 ## 🖼️ 截图
 
@@ -41,7 +43,7 @@
 
 ### 方法一：下载 Release（推荐）
 
-前往 [Releases 页面](https://github.com/qingranawa/Cassiewordcheck/releases) 下载最新版本的 `CASSIE-CWC-Tool-Setup-x.y.z.exe`，安装后即可从开始菜单或桌面快捷方式启动。
+前往 [Releases 页面](https://github.com/qingranawa/Cassiewordcheck/releases) 下载最新的 `CassieWordCheck*.msix`，按 Windows 提示安装即可。开发包默认未签名，正式发行时应替换为受信任的签名证书。
 
 ### 方法二：自行构建
 
@@ -50,15 +52,17 @@
 git clone https://github.com/qingranawa/Cassiewordcheck.git
 cd CassieWordCheck
 
-# 恢复依赖 & 构建
-dotnet restore
-dotnet build -c Release
+# 恢复依赖
+dotnet restore CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj
 
-# 自包含文件夹发布（输出到 dist/）
-dotnet publish -c Release -r win-x64 -o dist --self-contained true
+# 构建 WinUI 3 应用
+dotnet build CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj -c Release -p:Platform=x64
+
+# 生成 MSIX（输出到 CassieWordCheck.WinUI/bin/Release/AppPackages/）
+dotnet build CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj -c Release -p:Platform=x64 -p:PublishProfile=Properties/PublishProfiles/win10-x64.pubxml -p:GenerateAppxPackageOnBuild=true
 ```
 
-如需生成安装包，请在 Windows 上安装 Inno Setup 6 后编译 `setup.iss`；日常本地打包也可以直接双击项目根目录的 `publish.bat`。
+也可以运行项目根目录的 `publish.bat`。
 
 ## 🎮 使用方式
 
@@ -74,9 +78,15 @@ dotnet publish -c Release -r win-x64 -o dist --self-contained true
 
 ```
 CassieWordCheck/
-├── CassieWordCheck.csproj    项目配置（.NET 8 WPF）
 ├── CassieWordCheck.sln       解决方案
-├── app.manifest              Windows 清单
+├── CassieWordCheck.Core/     无 UI 的模型、检查引擎和数据服务
+├── CassieWordCheck.WinUI/    WinUI 3 + Windows App SDK 应用与单项目 MSIX
+│   ├── App.xaml              应用入口与全局资源
+│   ├── MainWindow.xaml       Fluent NavigationView 主窗口
+│   ├── Views/Pages/          检查、历史、统计、词库、设置和关于页面
+│   ├── Assets/               MSIX 图标与启动图资源
+│   └── Package.appxmanifest  MSIX 包清单
+├── CassieWordCheck.Tests/    核心逻辑与迁移回归测试
 │
 ├── Models/                   数据模型 & 核心逻辑
 │   ├── Checker.cs           检查引擎（分词/过滤/统计）
@@ -86,43 +96,24 @@ CassieWordCheck/
 │   └── Settings.cs          设置读写（JSON）
 │
 ├── Resources/
-│   ├── Styles.xaml          全局暗色主题样式
 │   ├── Locales/             多语言翻译 JSON（8 种语言）
-│   └── Services/
-│       ├── DocumentBuilder.cs   结果 → 富文本 FlowDocument
-│       ├── MarkdownConverter.cs Markdown → FlowDocument 渲染
-│       ├── LevenshteinHelper.cs 编辑距离（拼写建议）
-│       ├── LocalizationService.cs  多语言管理
-│       ├── UpdateService.cs     自动更新（GitHub API）
-│       └── WindowHelper.cs     Win32 DWM API（暗色栏 + Mica）
+│   └── Services/            Core 复用的无 UI 服务
 │
-├── Views/                    WPF 窗口
-│   ├── MainWindow.xaml/cs   主窗口（输入/结果/统计/建议）
-│   ├── SettingsWindow       设置（过滤/语言/字体/更新）
-│   ├── StatisticsWindow     统计面板（折线图）
-│   ├── HistoryWindow        检查历史
-│   ├── WhitelistWindow      白名单管理
-│   └── AboutWindow          关于（功能/更新日志/关于/声明）
-│
-├── data/                    随程序发布的只读词库和图片
+├── data/                    运行时数据
 │   ├── cassie-text.txt      CASSIE 配音词库
 │   ├── AAA.ico              应用图标
 │   ├── AAA.JPG              工具栏图标
 │   └── qr.JPG               头像
 │
-├── Directory.Build.props    统一版本来源
-├── publish.bat              一键构建脚本
-├── setup.iss                Inno Setup 安装包脚本
-├── .github/workflows/       CI 与 GitHub Actions 自动发布
-├── CassieWordCheck.Tests/   xUnit 回归测试
-└── dist/                    构建输出
+├── publish.bat              一键生成 WinUI MSIX 脚本
+├── .github/workflows/       GitHub Actions 自动发布
+└── CassieWordCheck.WinUI/bin/  构建与 MSIX 输出
 ```
-
-用户设置和检查历史不会写入安装目录，而是保存在 `%LOCALAPPDATA%\CassieWordCheck`。首次升级时会从旧版本安装目录的 `data` 文件夹自动迁移已有 JSON 文件，且不会覆盖已经存在的新数据。
 
 ## 🔧 技术栈
 
-- **.NET 8** + **WPF**（Windows 桌面应用）
+- **.NET 8** + **WinUI 3** + **Windows App SDK 1.8**
+- **单项目 MSIX** — 使用 Windows SDK Build Tools 生成 x64 安装包
 - **CommunityToolkit.Mvvm** — MVVM 辅助
 - **ClosedXML** — Excel (.xlsx) 导入支持
 - **System.Text.Json** — JSON 序列化
@@ -131,8 +122,8 @@ CassieWordCheck/
 
 ## 📋 系统要求
 
-- Windows 10 1809+ / Windows 11
-- .NET 8 运行时（自包含发布版不需要）
+- Windows 10 22H2（最低构建版本 19041）或 Windows 11
+- MSIX 安装时由包管理器处理 Windows App SDK 依赖
 
 ## 🤝 参与贡献
 

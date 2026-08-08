@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-07-29
+last_updated: 2026-05-28
 updated_by: superpowers-memory:rebuild
 triggered_by_plan: null
 ---
@@ -32,7 +32,7 @@ triggered_by_plan: null
 
 ## 架构规则
 
-- Views 可以直接实例化 Models 和 Services（无 DI 容器——轻量级 WPF 模式）
+- WinUI 页面通过 `AppState` 访问 Models 和 Services（无 DI 容器，保持轻量级 code-behind 模式）
 - Models 不得引用 UI 类型（Windows、Controls、Dispatcher）
 - Services 不得引用 Views
 - 词库加载后不可变（`FrozenSet`），除非通过 `AddFromFile` 显式修改（会重建集合）
@@ -40,17 +40,16 @@ triggered_by_plan: null
 
 ## 测试约定
 
-**测试框架：** xUnit，测试项目为 `CassieWordCheck.Tests/`
-**Mock 原则：** 优先测试真实文件和真实业务对象；只有外部网络或不可控系统边界才使用 mock
-**资源检查：** `ProjectIntegrityValidatorTests` 验证内置词库和所有本地化 JSON；CI 在 Push/PR 时运行完整测试
+**测试框架：** xUnit，测试项目只引用 Core
+**Mock 原则：** 优先使用真实的临时文件和 Core 服务，只有外部边界才使用 mock
 
 ## Git 与工作流
 
 **提交风格：** Conventional Commits（feat/fix/docs 前缀）
-**分支：** main（观察到单分支工作流）
+**分支：** `winui3-msix`（迁移分支）
 
 ## 横切关注点
 
 **国际化：** 所有面向用户的字符串必须通过 `LocalizationService`——禁止硬编码 UI 文本。 → `Resources/Services/LocalizationService.cs`
-**动画：** 使用 WPF `DoubleAnimation` + `QuadraticEase`/`BackEase` 实现一致的 UI 动效。 → `Views/MainWindow.xaml.cs` §动画辅助方法
+**视觉：** 使用 WinUI Fluent 资源、Mica、卡片样式和控件状态，不在页面代码散落颜色值。
 **持久化：** 通过 `System.Text.Json` 以 JSON 格式保存设置和历史；文件损坏时静默回退。 → `Models/Settings.cs`，`Models/HistoryStore.cs`

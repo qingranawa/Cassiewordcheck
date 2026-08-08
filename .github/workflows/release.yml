@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Existing or new release tag, for example v2.4.4"
+        description: "Existing or new release tag, for example v2.5.0"
         required: true
-        default: "v2.4.4"
+        default: "v2.5.0"
         type: string
 
 permissions:
@@ -46,59 +46,18 @@ jobs:
       - name: Test
         run: dotnet test CassieWordCheck.Tests/CassieWordCheck.Tests.csproj --configuration Release --verbosity normal
 
-      - name: Build & Publish to dist
-        run: dotnet publish CassieWordCheck.csproj -c Release -r win-x64 -o dist --self-contained true "-p:Version=${env:RELEASE_VERSION}" "-p:AssemblyVersion=${env:RELEASE_VERSION}.0" "-p:FileVersion=${env:RELEASE_VERSION}.0" --verbosity quiet
+      - name: Restore WinUI 3 project
+        run: dotnet restore CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj
 
-      - name: Clean debug symbols
-        run: Remove-Item "dist/*.pdb" -ErrorAction SilentlyContinue
-
-      - name: Install Inno Setup 6
-        shell: pwsh
-        env:
-          INNO_SETUP_VERSION: 6.5.0
-          INNO_SETUP_SHA256: 79b7a1063b3888bb8eceb44a8c28e90ccdaa22ac71f9272de1dac79b42941dbd
-        run: |
-          $installer = Join-Path $env:TEMP "innosetup-$env:INNO_SETUP_VERSION.exe"
-          $downloadUrl = "https://github.com/jrsoftware/issrc/releases/download/is-6_5_0/innosetup-$env:INNO_SETUP_VERSION.exe"
-          Invoke-WebRequest -Uri $downloadUrl -OutFile $installer
-
-          if (-not (Test-Path $installer)) {
-            throw "Inno Setup installer was not downloaded: $installer"
-          }
-
-          $actualHash = (Get-FileHash -Path $installer -Algorithm SHA256).Hash.ToLowerInvariant()
-          if ($actualHash -ne $env:INNO_SETUP_SHA256) {
-            throw "Inno Setup installer hash mismatch. Expected $env:INNO_SETUP_SHA256, got $actualHash"
-          }
-
-          $installDir = Join-Path ${env:ProgramFiles} 'Inno Setup 6'
-          $arguments = @(
-            '/VERYSILENT'
-            '/SUPPRESSMSGBOXES'
-            '/NORESTART'
-            "/DIR=`"$installDir`""
-          )
-          $process = Start-Process -FilePath $installer -ArgumentList $arguments -WorkingDirectory $env:TEMP -Wait -PassThru
-          if ($process.ExitCode -ne 0) {
-            throw "Inno Setup installer failed with exit code $($process.ExitCode)"
-          }
-
-          $iscc = Join-Path $installDir 'ISCC.exe'
-          if (-not (Test-Path $iscc)) {
-            throw "Inno Setup compiler was not installed: $iscc"
-          }
-          "INNO_SETUP_COMPILER=$iscc" >> $env:GITHUB_ENV
-
-      - name: Compile Setup
+      - name: Build unsigned MSIX
         shell: pwsh
         run: |
-          & $env:INNO_SETUP_COMPILER setup.iss "/dMyAppVersion=$env:RELEASE_VERSION"
-          if ($LASTEXITCODE -ne 0) {
-            exit $LASTEXITCODE
-          }
+          $releaseVersion = $env:RELEASE_VERSION
+          $fileVersion = "$releaseVersion.0"
+          dotnet build CassieWordCheck.WinUI/CassieWordCheck.WinUI.csproj -c Release -p:Platform=x64 -p:PublishProfile=Properties\PublishProfiles\win10-x64.pubxml -p:GenerateAppxPackageOnBuild=true -p:AppxPackageSigningEnabled=false "-p:Version=$releaseVersion" "-p:FileVersion=$fileVersion" --verbosity quiet
 
       - name: Create Release & Upload
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.release_tag || github.ref_name }}
-          files: "CASSIE-CWC-Tool-Setup-*.exe"
+          files: "CassieWordCheck.WinUI/bin/Release/AppPackages/**/*.msix"

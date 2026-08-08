@@ -1,68 +1,45 @@
 @echo off
-setlocal enabledelayedexpansion
-title CassieWordCheck Publish
+setlocal
+title CassieWordCheck MSIX
 
 set PROJ_DIR=%~dp0
-set PUBLISH_DIR=%PROJ_DIR%dist
-set APP_NAME=CassieWordCheck
-set RID=win-x64
-set VERSION=unknown
-for /f "tokens=2 delims=<>" %%A in ('findstr /C:"<VersionPrefix>" "%PROJ_DIR%Directory.Build.props"') do set VERSION=%%A
+set "WINUI_PROJ=%PROJ_DIR%CassieWordCheck.WinUI\CassieWordCheck.WinUI.csproj"
 
 echo ========================================
-echo   CassieWordCheck - Publish Package
-echo   Runtime: %RID% (Self-contained folder publish)
-echo   Version: %VERSION%
+echo   CassieWordCheck - WinUI 3 MSIX
+echo   Platform: x64
+echo   Version: 2.5.0
 echo ========================================
 echo.
 
 where dotnet >nul 2>nul
 if %errorlevel% neq 0 (
     echo [ERROR] dotnet not found.
-    pause
     exit /b 1
 )
 
 pushd "%PROJ_DIR%"
 
-if exist "%PUBLISH_DIR%" (
-    echo [1/5] Cleaning...
-    rmdir /s /q "%PUBLISH_DIR%" 2>nul
-)
-
-echo [2/5] Restoring...
-call dotnet restore "%APP_NAME%.csproj" --verbosity quiet
+echo [1/3] Restoring...
+call dotnet restore "%WINUI_PROJ%" --verbosity quiet
 if %errorlevel% neq 0 goto :err
 
-echo [3/5] Building...
-call dotnet build "%APP_NAME%.csproj" -c Release --verbosity quiet
+echo [2/3] Building WinUI...
+call dotnet build "%WINUI_PROJ%" -c Release -p:Platform=x64 --verbosity quiet
 if %errorlevel% neq 0 goto :err
 
-echo [4/5] Publishing...
-call dotnet publish "%APP_NAME%.csproj" -c Release -r %RID% -o "%PUBLISH_DIR%" --verbosity normal
+echo [3/3] Generating unsigned MSIX...
+call dotnet build "%WINUI_PROJ%" -c Release -p:Platform=x64 -p:PublishProfile=Properties\PublishProfiles\win10-x64.pubxml -p:GenerateAppxPackageOnBuild=true -p:AppxPackageSigningEnabled=false --verbosity quiet
 if %errorlevel% neq 0 goto :err
 
-if exist "%PUBLISH_DIR%\*.pdb" del /q "%PUBLISH_DIR%\*.pdb" 2>nul
-
 echo.
-echo ====== Output ======
-dir /b "%PUBLISH_DIR%data\" 2>nul
-if exist "%PUBLISH_DIR%Resources\" (
-    echo   [res] Resources\Locales\
-)
-echo ====================
-echo.
-echo Done!
-echo.
-start "" "%PUBLISH_DIR%"
-goto :end
+echo MSIX output:
+dir /s /b "%PROJ_DIR%CassieWordCheck.WinUI\bin\Release\AppPackages\*.msix"
+popd
+exit /b 0
 
 :err
 echo.
 echo [FAILED]
-pause
+popd
 exit /b 1
-
-:end
-endlocal
-exit /b 0

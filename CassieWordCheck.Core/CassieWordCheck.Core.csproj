@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Models\*.cs" Link="Models\%(Filename)%(Extension)" />
+    <Compile Include="..\Resources\Services\LevenshteinHelper.cs" Link="Services\LevenshteinHelper.cs" />
+    <Compile Include="..\Resources\Services\LocalizationService.cs" Link="Services\LocalizationService.cs" />
+    <Compile Include="..\Resources\Services\ProjectIntegrityValidator.cs" Link="Services\ProjectIntegrityValidator.cs" />
+    <Compile Include="..\Resources\Services\SuggestionEngine.cs" Link="Services\SuggestionEngine.cs" />
+    <Compile Include="..\Resources\Services\UpdateService.cs" Link="Services\UpdateService.cs" />
+    <Compile Include="..\Resources\Services\WordCountService.cs" Link="Services\WordCountService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.102.3" />
+    <PackageReference Include="System.Xml.ReaderWriter" Version="4.3.1" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
