@@ -51,10 +51,11 @@ public static class AppDataPaths
                     packagesDirectory,
                     $"{ProductDirectoryName}_*",
                     SearchOption.TopDirectoryOnly)
-                .OrderBy(directory => directory, StringComparer.OrdinalIgnoreCase)
-                .ThenBy(directory => directory, StringComparer.Ordinal)
                 .Select(directory => Path.Combine(directory, "LocalState", "data"))
                 .Where(Directory.Exists)
+                .OrderByDescending(GetLatestLegacyDataFileWriteTimeUtc)
+                .ThenBy(directory => directory, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(directory => directory, StringComparer.Ordinal)
                 .ToArray();
         }
         catch (UnauthorizedAccessException)
@@ -66,6 +67,31 @@ public static class AppDataPaths
             return Array.Empty<string>();
         }
     }
+
+    private static DateTime GetLatestLegacyDataFileWriteTimeUtc(string dataDirectory)
+    {
+        try
+        {
+            var latestWriteTime = DateTime.MinValue;
+            foreach (var filePath in Directory.EnumerateFiles(dataDirectory, "*", SearchOption.TopDirectoryOnly))
+            {
+                latestWriteTime = Max(latestWriteTime, File.GetLastWriteTimeUtc(filePath));
+            }
+
+            return latestWriteTime;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return DateTime.MinValue;
+        }
+        catch (IOException)
+        {
+            return DateTime.MinValue;
+        }
+    }
+
+    private static DateTime Max(DateTime first, DateTime second) =>
+        first >= second ? first : second;
 
     private static string GetLocalApplicationDataDirectory()
     {

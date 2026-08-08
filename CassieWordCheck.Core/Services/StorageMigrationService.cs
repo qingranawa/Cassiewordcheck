@@ -18,7 +18,18 @@ public static class StorageMigrationService
         string localDataDirectory)
     {
         ArgumentNullException.ThrowIfNull(legacyDataDirectories);
-        Directory.CreateDirectory(localDataDirectory);
+        try
+        {
+            Directory.CreateDirectory(localDataDirectory);
+        }
+        catch (IOException)
+        {
+            return new StorageMigrationResult(false, false);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return new StorageMigrationResult(false, false);
+        }
 
         var settingsMigrated = false;
         var historyMigrated = false;
