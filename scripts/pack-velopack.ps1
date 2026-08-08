@@ -51,7 +51,9 @@ function Get-SafeOutputPath {
     }
 
     $resolvedExistingPath = (Resolve-Path -LiteralPath $existingPath).Path
-    if (-not $resolvedExistingPath.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+    $isRepositoryRoot = [string]::Equals($resolvedExistingPath, $rootPath, [System.StringComparison]::OrdinalIgnoreCase)
+    $isRepositoryDescendant = $resolvedExistingPath.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)
+    if (-not ($isRepositoryRoot -or $isRepositoryDescendant)) {
         throw "输出目录的现存父路径不在仓库内：$resolvedExistingPath"
     }
 

@@ -13,6 +13,7 @@ internal static class AboutWindowChangelog
 ### 发布调整
 - **分发方式调整** — 从 MSIX 改为 Velopack EXE 安装程序，应用改为自包含发布
 - **版本与验证流程统一** — 由 Directory.Build.props 统一提供 2.5.1 和 2.5.1.0 元数据，迁移验证改为校验 Velopack 发布产物
+- **干净检出打包路径修复** — 修复无 `dist` 目录时的干净检出打包路径解析
 - **多语言关于页与历史清单同步** — 同步八种语言关于页的 Velopack EXE 安装器文案，并将历史 `Package.appxmanifest` 更新为 `2.5.1.0`，明确其不参与当前 unpackaged/Velopack 发布
 - **用户数据迁移** — 用户数据迁移到 LocalAppData，并兼容旧 MSIX LocalState
 - **旧数据迁移加固** — 加强旧 MSIX 多源选择，并在迁移失败时安全保护
