@@ -42,3 +42,7 @@ CASSIE-CWC-Tool-Setup-*.exe
 ## Temp / debug
 %TEMP%/
 debug.txt
+/.superpowers/brainstorm/
+/docs/
+!.config/dotnet-tools.json
+!scripts/pack-velopack.ps1
