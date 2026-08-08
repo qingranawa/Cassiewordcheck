@@ -43,7 +43,7 @@
 
 ### 方法一：下载 Release（推荐）
 
-前往 [Releases 页面](https://github.com/qingranawa/Cassiewordcheck/releases) 下载最新的 `Setup.exe`，双击运行安装。应用采用 WinUI 3 unpackaged 模式，发布包内置 Windows App SDK self-contained 运行时，并通过 Velopack 提供传统的按用户安装方式。安装过程中不需要导入证书，也不需要使用 Windows App Installer。
+前往 [Releases 页面](https://github.com/qingranawa/Cassiewordcheck/releases) 下载最新的 `*-Setup.exe`（当前示例为 `qingranawa.CassieWordCheck-win-Setup.exe`），双击运行安装。应用采用 WinUI 3 unpackaged 模式，发布包内置 Windows App SDK self-contained 运行时，并通过 Velopack 提供传统的按用户安装方式。安装过程中不需要导入证书，也不需要使用 Windows App Installer。
 
 ### 方法二：自行构建
 
@@ -59,7 +59,7 @@ pwsh -NoProfile -File scripts/pack-velopack.ps1 -Configuration Release -Version 
 publish.bat
 ```
 
-打包完成后，所有 Velopack 产物位于 `dist/velopack/Releases`，包括 `Setup.exe`、`releases.win.json`、完整包（`*-full.nupkg`）和增量包（`*-delta.nupkg`）。
+打包完成后，所有 Velopack 产物位于 `dist/velopack/Releases`，包括匹配 `*-Setup.exe` 的安装器（当前示例为 `qingranawa.CassieWordCheck-win-Setup.exe`）、`releases.win.json` feed 和完整包（`*-full.nupkg`）。只有存在上一版本可用于生成差分更新时，才会额外生成增量包（`*-delta.nupkg`）；首次发布必须提供安装器、feed 和完整包。
 
 ## 🎮 使用方式
 
@@ -82,7 +82,7 @@ CassieWordCheck/
 │   ├── MainWindow.xaml       Fluent NavigationView 主窗口
 │   ├── Views/Pages/          检查、历史、统计、词库、设置和关于页面
 │   ├── Assets/               应用图标与启动图资源
-│   └── Package.appxmanifest  应用清单配置
+│   └── Package.appxmanifest  仅为历史 MSIX 清单，不参与当前 Velopack 发布
 ├── CassieWordCheck.Tests/    核心逻辑与迁移回归测试
 │
 ├── Models/                   数据模型 & 核心逻辑
@@ -113,7 +113,7 @@ CassieWordCheck/
 
 - **.NET 8** + **WinUI 3** + **Windows App SDK 1.8**
 - **WinUI 3 unpackaged** — 与 Windows App SDK self-contained 运行时一起发布
-- **Velopack** — 生成 `Setup.exe`、发布 feed、完整包和增量包
+- **Velopack** — 生成匹配 `*-Setup.exe` 的安装器、发布 feed 和完整包；存在上一版本时再生成增量包
 - **CommunityToolkit.Mvvm** — MVVM 辅助
 - **ClosedXML** — Excel (.xlsx) 导入支持
 - **System.Text.Json** — JSON 序列化
@@ -122,7 +122,7 @@ CassieWordCheck/
 
 ## 📋 系统要求
 
-- Windows 10 22H2（最低构建版本 19041）或 Windows 11
+- Windows 10 build 19041 或更高版本（包括 Windows 11）
 - Release 安装包内置 Windows App SDK self-contained 运行时，不需要额外安装运行时或导入证书
 
 ## 🤝 参与贡献

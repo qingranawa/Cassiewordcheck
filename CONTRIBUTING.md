@@ -42,7 +42,7 @@ git push origin feat/my-awesome-feature
 |------|------|
 | .NET SDK | 8.0+ |
 | IDE | JetBrains Rider / Visual Studio 2022+ |
-| 运行时 | Windows 10 1809+ |
+| 运行时 | Windows 10 build 19041 或更高版本（包括 Windows 11） |
 
 ### 快速开始
 
@@ -69,19 +69,18 @@ publish.bat
 
 1. 恢复项目依赖和本地 .NET 工具
 2. 以 x64 发布带 Windows App SDK self-contained 运行时的 WinUI 3 unpackaged 应用
-3. 使用 Velopack 生成安装程序、发布 feed、完整包和增量包
+3. 使用 Velopack 生成安装器、发布 feed 和完整包；仅在存在上一版本时生成增量包
 
 输出结构：
 
 ```
 dist/velopack/Releases/
-├── Setup.exe
+├── qingranawa.CassieWordCheck-win-Setup.exe
 ├── releases.win.json
-├── qingranawa.CassieWordCheck-2.5.1-full.nupkg
-└── qingranawa.CassieWordCheck-2.5.1-delta.nupkg
+└── qingranawa.CassieWordCheck-2.5.1-full.nupkg
 ```
 
-其中完整包和增量包的文件名会随 `-Version` 参数变化。发布或提交变更前，请确认 `Setup.exe`、`releases.win.json` 以及预期的完整包和增量包均位于 `dist/velopack/Releases`。
+其中安装器名称匹配 `*-Setup.exe`，上例为 `qingranawa.CassieWordCheck-win-Setup.exe`；完整包文件名会随 `-Version` 参数变化。首次发布必须包含安装器、`releases.win.json` feed 和 `*-full.nupkg`。只有存在上一版本可用于生成差分更新时，才会生成 `*-delta.nupkg`，该包不属于首次发布的必需产物。发布或提交变更前，请确认安装器、feed 和完整包均位于 `dist/velopack/Releases`；若存在上一版本，再确认预期的增量包也位于该目录。
 
 ## 🔧 代码规范
 
@@ -156,7 +155,7 @@ git tag v2.5.1
 git push origin v2.5.1
 ```
 
-推送 `vX.Y.Z` 标签会触发 GitHub Actions 工作流。工作流会保留标签格式校验和 Core 测试，然后调用 `scripts/pack-velopack.ps1`，将 `dist/velopack/Releases` 下的 `Setup.exe`、`releases.win.json`、完整包和增量包全部上传到 GitHub Release。
+推送 `vX.Y.Z` 标签会触发 GitHub Actions 工作流。工作流会保留标签格式校验和 Core 测试，然后调用 `scripts/pack-velopack.ps1`，将 `dist/velopack/Releases` 下匹配 `*-Setup.exe` 的安装器、`releases.win.json`、完整包和已有的增量包全部上传到 GitHub Release。
 
 ## 📁 项目结构说明
 
